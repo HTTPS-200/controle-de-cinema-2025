@@ -2,8 +2,8 @@
 using ControleDeCinema.Infraestrutura.Orm.ModuloSala;
 using ControleDeCinema.Infraestrutura.Orm.Compartilhado;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using ControleDeCinema.Testes.Integracao.Compatilhado;
 using Microsoft.EntityFrameworkCore;
+using ControleDeCinema.Testes.Integracao.Compartilhado;
 
 namespace ControleDeCinema.Testes.Integracao.ModuloSala
 {

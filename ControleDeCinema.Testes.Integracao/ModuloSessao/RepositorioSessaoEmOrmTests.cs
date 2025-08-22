@@ -2,8 +2,8 @@
 using ControleDeCinema.Dominio.ModuloSala;
 using ControleDeCinema.Dominio.ModuloFilme;
 using ControleDeCinema.Dominio.ModuloGeneroFilme;
-using ControleDeCinema.Testes.Integracao.Compatilhado;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using ControleDeCinema.Testes.Integracao.Compartilhado;
 
 namespace ControleDeCinema.Testes.Integracao.ModuloSessao
 {
