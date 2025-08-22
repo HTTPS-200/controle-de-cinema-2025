@@ -11,7 +11,7 @@ using DotNet.Testcontainers.Containers;
 using FizzWare.NBuilder;
 using Testcontainers.PostgreSql;
 
-namespace ControleDeCinema.Testes.Integracao.Compatilhado;
+namespace ControleDeCinema.Testes.Integracao.Compartilhado;
 
 [TestClass]
 public abstract class TestFixture
