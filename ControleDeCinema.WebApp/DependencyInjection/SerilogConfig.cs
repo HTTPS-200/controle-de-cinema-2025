@@ -9,26 +9,27 @@ public static class SerilogConfig
     {
         var licenseKey = configuration["NEWRELIC_LICENSE_KEY"];
 
-        if (string.IsNullOrWhiteSpace(licenseKey))
-            throw new Exception("A variável NEWRELIC_LICENSE_KEY não foi fornecida.");
-
         var caminhoAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-
         var caminhoArquivoLogs = Path.Combine(caminhoAppData, "ControleDeCinema", "erro.log");
 
-        Log.Logger = new LoggerConfiguration()
+        var loggerConfig = new LoggerConfiguration()
             .MinimumLevel.Information()
             .WriteTo.Console()
-            .WriteTo.File(caminhoArquivoLogs, LogEventLevel.Error)
-            .WriteTo.NewRelicLogs(
+            .WriteTo.File(caminhoArquivoLogs, LogEventLevel.Error);
+
+
+        if (!string.IsNullOrWhiteSpace(licenseKey))
+        {
+            loggerConfig.WriteTo.NewRelicLogs(
                 endpointUrl: "https://log-api.newrelic.com/log/v1",
                 applicationName: "controle-de-cinema-app",
                 licenseKey: licenseKey
-            )
-            .CreateLogger();
+            );
+        }
+
+        Log.Logger = loggerConfig.CreateLogger();
 
         logging.ClearProviders();
-
         services.AddSerilog();
     }
 }
