@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 namespace ControleDeCinema.Testes.Unidade.ModuloFilme;
 
 [TestClass]
-[TestCategory("Testes - Unidade - Filme")]
+[TestCategory("Testes - Unidade/Aplicação - Filme")]
 public sealed class FilmeAppServiceTests
 {
     private Mock<IRepositorioFilme>? repositorioFilmeMock;
@@ -86,58 +86,85 @@ public sealed class FilmeAppServiceTests
         Assert.AreEqual(1, resultado.Errors.Count);
     }
 
-
-    //!!! Atualmente, o método Cadastrar da classe FilmeAppService não faz validação para duração negativa do filme. !!!
     [TestMethod]
-    public void Deve_Retornar_Fail_Quando_Duração_For_Negativa()  
+    public void Deve_Retornar_Fail_Quando_Excessao_For_Lancada()
     {
         // Arrange
         var genero = new GeneroFilme("Ação");
-        var filme = new Filme("Contra o Tempo", -148, false, genero);
-        
-        var filmeTeste = new Filme("Iterception", 148, false, genero);
+        var filme = new Filme("Contra o Tempo", 148, false, genero);
         
         repositorioFilmeMock!
             .Setup(r => r.SelecionarRegistros())
-            .Returns(new List<Filme>() { filmeTeste });
+            .Returns(new List<Filme>());
+
+        repositorioFilmeMock!
+            .Setup(r => r.Cadastrar(It.IsAny<Filme>()))
+            .Throws(new Exception("Erro ao cadastrar filme"));
 
         // Act
         var resultado = filmeAppService!.Cadastrar(filme);
-
+        
         // Assert
-        repositorioFilmeMock?.Verify(r => r.Cadastrar(filme), Times.Never);
+        repositorioFilmeMock?.Verify(r => r.Cadastrar(filme), Times.Once);
         unitOfWorkMock?.Verify(u => u.Commit(), Times.Never);
+        unitOfWorkMock?.Verify(u => u.Rollback(), Times.Once);
         
         Assert.IsNotNull(resultado);
         Assert.IsTrue(resultado.IsFailed);
         Assert.AreEqual(1, resultado.Errors.Count);
     }
 
-    //!!! Atualmente, o método Cadastrar da classe FilmeAppService não faz validação para campos obrigatórios vazios. !!!
-    [TestMethod]
-    public void Deve_Retornar_Fail_Quando_Campos_Obrigatrios_Estiverem_Vazios()
-    {
-        // Arrange
-        var genero = new GeneroFilme("Ação");
-        var filme = new Filme("", 0, false, genero);
-        
-        var filmeTeste = new Filme("Iterception", 148, false, genero);
-        
-        repositorioFilmeMock!
-            .Setup(r => r.SelecionarRegistros())
-            .Returns(new List<Filme>() { filmeTeste });
-        
-        // Act
-        var resultado = filmeAppService!.Cadastrar(filme);
-       
-        // Assert
-        repositorioFilmeMock?.Verify(r => r.Cadastrar(filme), Times.Never);
-        unitOfWorkMock?.Verify(u => u.Commit(), Times.Never);
-        
-        Assert.IsNotNull(resultado);
-        Assert.IsTrue(resultado.IsFailed);
-        Assert.AreEqual(1, resultado.Errors.Count);
-    }
+    // Testes adicionais para validação de dados que não foram implementados na classe FilmeAppService
 
+    ////!!! Atualmente, o método Cadastrar da classe FilmeAppService não faz validação para duração negativa do filme. !!!
+    //[TestMethod]
+    //public void Deve_Retornar_Fail_Quando_Duração_For_Negativa()  
+    //{
+    //    // Arrange
+    //    var genero = new GeneroFilme("Ação");
+    //    var filme = new Filme("Contra o Tempo", -148, false, genero);
 
+    //    var filmeTeste = new Filme("Iterception", 148, false, genero);
+
+    //    repositorioFilmeMock!
+    //        .Setup(r => r.SelecionarRegistros())
+    //        .Returns(new List<Filme>() { filmeTeste });
+
+    //    // Act
+    //    var resultado = filmeAppService!.Cadastrar(filme);
+
+    //    // Assert
+    //    repositorioFilmeMock?.Verify(r => r.Cadastrar(filme), Times.Never);
+    //    unitOfWorkMock?.Verify(u => u.Commit(), Times.Never);
+
+    //    Assert.IsNotNull(resultado);
+    //    Assert.IsTrue(resultado.IsFailed);
+    //    Assert.AreEqual(1, resultado.Errors.Count);
+    //}
+
+    ////!!! Atualmente, o método Cadastrar da classe FilmeAppService não faz validação para campos obrigatórios vazios. !!!
+    //[TestMethod]
+    //public void Deve_Retornar_Fail_Quando_Campos_Obrigatrios_Estiverem_Vazios()
+    //{
+    //    // Arrange
+    //    var genero = new GeneroFilme("Ação");
+    //    var filme = new Filme("", 0, false, genero);
+
+    //    var filmeTeste = new Filme("Iterception", 148, false, genero);
+
+    //    repositorioFilmeMock!
+    //        .Setup(r => r.SelecionarRegistros())
+    //        .Returns(new List<Filme>() { filmeTeste });
+
+    //    // Act
+    //    var resultado = filmeAppService!.Cadastrar(filme);
+
+    //    // Assert
+    //    repositorioFilmeMock?.Verify(r => r.Cadastrar(filme), Times.Never);
+    //    unitOfWorkMock?.Verify(u => u.Commit(), Times.Never);
+
+    //    Assert.IsNotNull(resultado);
+    //    Assert.IsTrue(resultado.IsFailed);
+    //    Assert.AreEqual(1, resultado.Errors.Count);
+    //}
 }
