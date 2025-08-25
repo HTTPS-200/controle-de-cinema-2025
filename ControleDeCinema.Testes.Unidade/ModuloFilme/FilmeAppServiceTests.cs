@@ -1,11 +1,10 @@
-﻿using Microsoft.Extensions.Logging;
-using Moq;
-using ControledeCinema.Dominio.Compartilhado;
+﻿using ControledeCinema.Dominio.Compartilhado;
 using ControleDeCinema.Aplicacao.ModuloFilme;
+using ControleDeCinema.Dominio.ModuloAutenticacao;
 using ControleDeCinema.Dominio.ModuloFilme;
 using ControleDeCinema.Dominio.ModuloGeneroFilme;
-using ControleDeCinema.Dominio.ModuloAutenticacao;
-using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.Extensions.Logging;
+using Moq;
 
 
 namespace ControleDeCinema.Testes.Unidade.ModuloFilme;
