@@ -98,5 +98,4 @@ public sealed class RepositorioFilmeEmOrmTests : TestFixture
         // Assert
         CollectionAssert.Equals(listFilmesOrdenados, registros);
     }
-
 }
