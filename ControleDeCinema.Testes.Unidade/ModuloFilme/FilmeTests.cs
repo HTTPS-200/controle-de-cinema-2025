@@ -35,7 +35,9 @@ public sealed class FilmeTests
         var genero = new GeneroFilme("Ação");
         var listFilme = new List<Filme>
         {
-            new Filme("Vingadores", 120, true, genero)
+            new Filme("Vingadores", 120, true, genero),
+            new Filme("Vigadores: Ultimato", 180, true, genero),
+            new Filme("Batman", 150, false, genero)
         };
 
         var novoFilme = new Filme("Vingadores", 150, false, genero);
