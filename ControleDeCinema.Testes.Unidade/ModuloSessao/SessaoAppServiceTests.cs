@@ -3,12 +3,12 @@ using ControleDeCinema.Dominio.ModuloSessao;
 using ControleDeCinema.Dominio.ModuloSala;
 using ControleDeCinema.Dominio.ModuloFilme;
 using ControleDeCinema.Dominio.ModuloGeneroFilme;
+using ControleDeCinema.Dominio.ModuloAutenticacao;
 using FluentResults;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ControledeCinema.Dominio.Compartilhado;
-using ControleDeCinema.Dominio.ModuloAutenticacao;
 
 namespace ControleDeCinema.Testes.Unidade.ModuloSessao
 {
@@ -33,6 +33,7 @@ namespace ControleDeCinema.Testes.Unidade.ModuloSessao
             loggerMock = new Mock<ILogger<SessaoAppService>>();
 
             tenantMock.Setup(t => t.UsuarioId).Returns(Guid.NewGuid());
+            tenantMock.Setup(t => t.IsInRole(It.IsAny<string>())).Returns(false);
 
             appService = new SessaoAppService(
                 tenantMock.Object,
@@ -80,7 +81,6 @@ namespace ControleDeCinema.Testes.Unidade.ModuloSessao
         public void Cadastrar_Deve_RetornarFalha_QuandoNumeroMaximoIngressosExcede()
         {
             var sessao = new Sessao(DateTime.Now.AddHours(1), 100, filme, sala);
-
             repositorioMock.Setup(r => r.SelecionarRegistros()).Returns(new List<Sessao>());
 
             var resultado = appService.Cadastrar(sessao);
@@ -99,6 +99,119 @@ namespace ControleDeCinema.Testes.Unidade.ModuloSessao
 
             unitOfWorkMock.Verify(u => u.Rollback(), Times.Once);
             Assert.IsTrue(resultado.IsFailed);
+        }
+
+        [TestMethod]
+        public void Editar_Deve_RetornarOk_QuandoSessaoValida()
+        {
+            var id = Guid.NewGuid();
+            var sessaoEditada = new Sessao(DateTime.Now.AddHours(2), 30, filme, sala);
+
+            repositorioMock.Setup(r => r.SelecionarRegistros()).Returns(new List<Sessao>());
+            repositorioMock.Setup(r => r.Editar(id, sessaoEditada)).Returns(true);
+
+            var resultado = appService.Editar(id, sessaoEditada);
+
+            unitOfWorkMock.Verify(u => u.Commit(), Times.Once);
+            Assert.IsTrue(resultado.IsSuccess);
+        }
+
+        [TestMethod]
+        public void Editar_Deve_RetornarFalha_QuandoNaoEncontrada()
+        {
+            var id = Guid.NewGuid();
+            var sessaoEditada = new Sessao(DateTime.Now.AddHours(2), 30, filme, sala);
+
+            repositorioMock.Setup(r => r.SelecionarRegistros()).Returns(new List<Sessao>());
+            repositorioMock.Setup(r => r.Editar(id, sessaoEditada)).Returns(false);
+
+            var resultado = appService.Editar(id, sessaoEditada);
+
+            Assert.IsTrue(resultado.IsFailed);
+        }
+
+        [TestMethod]
+        public void Excluir_Deve_RetornarOk_QuandoSucesso()
+        {
+            var id = Guid.NewGuid();
+            repositorioMock.Setup(r => r.Excluir(id)).Returns(true);
+
+            var resultado = appService.Excluir(id);
+
+            unitOfWorkMock.Verify(u => u.Commit(), Times.Once);
+            Assert.IsTrue(resultado.IsSuccess);
+        }
+
+        [TestMethod]
+        public void Excluir_Deve_RetornarFalha_QuandoNaoEncontrada()
+        {
+            var id = Guid.NewGuid();
+            repositorioMock.Setup(r => r.Excluir(id)).Returns(false);
+
+            var resultado = appService.Excluir(id);
+
+            Assert.IsTrue(resultado.IsFailed);
+        }
+
+        [TestMethod]
+        public void SelecionarPorId_Deve_RetornarSessao_QuandoEncontrada()
+        {
+            var id = Guid.NewGuid();
+            var sessao = new Sessao(DateTime.Now, 20, filme, sala);
+            repositorioMock.Setup(r => r.SelecionarRegistroPorId(id)).Returns(sessao);
+
+            var resultado = appService.SelecionarPorId(id);
+
+            Assert.IsTrue(resultado.IsSuccess);
+            Assert.AreEqual(sessao, resultado.Value);
+        }
+
+        [TestMethod]
+        public void SelecionarPorId_Deve_RetornarFalha_QuandoNaoEncontrada()
+        {
+            var id = Guid.NewGuid();
+            repositorioMock.Setup(r => r.SelecionarRegistroPorId(id)).Returns((Sessao)null);
+
+            var resultado = appService.SelecionarPorId(id);
+
+            Assert.IsTrue(resultado.IsFailed);
+        }
+
+        [TestMethod]
+        public void VenderIngresso_Deve_RetornarOk_QuandoAssentoDisponivel()
+        {
+            var sessao = new Sessao(DateTime.Now.AddHours(1), 5, filme, sala);
+            repositorioMock.Setup(r => r.SelecionarRegistroPorId(It.IsAny<Guid>())).Returns(sessao);
+
+            var resultado = appService.VenderIngresso(Guid.NewGuid(), 1, false);
+
+            Assert.IsTrue(resultado.IsSuccess);
+            Assert.AreEqual(1, resultado.Value.NumeroAssento);
+            Assert.AreEqual(1, sessao.Ingressos.Count);
+        }
+
+        [TestMethod]
+        public void VenderIngresso_Deve_RetornarFalha_QuandoAssentoOcupado()
+        {
+            var sessao = new Sessao(DateTime.Now.AddHours(1), 5, filme, sala);
+            sessao.GerarIngresso(1, false);
+            repositorioMock.Setup(r => r.SelecionarRegistroPorId(It.IsAny<Guid>())).Returns(sessao);
+
+            var resultado = appService.VenderIngresso(Guid.NewGuid(), 1, false);
+
+            Assert.IsTrue(resultado.IsFailed);
+        }
+
+        [TestMethod]
+        public void Encerrar_Deve_RetornarOk_QuandoSessaoExiste()
+        {
+            var sessao = new Sessao(DateTime.Now.AddHours(1), 5, filme, sala);
+            repositorioMock.Setup(r => r.SelecionarRegistroPorId(It.IsAny<Guid>())).Returns(sessao);
+
+            var resultado = appService.Encerrar(Guid.NewGuid());
+
+            Assert.IsTrue(resultado.IsSuccess);
+            Assert.IsTrue(sessao.Encerrada);
         }
     }
 }
