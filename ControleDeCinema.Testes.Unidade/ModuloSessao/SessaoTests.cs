@@ -29,13 +29,14 @@ namespace ControleDeCinema.Testes.Unidade.ModuloSessao
             Assert.AreEqual(filme, sessao.Filme);
             Assert.AreEqual(sala, sessao.Sala);
             Assert.AreEqual(30, sessao.NumeroMaximoIngressos);
+            Assert.IsFalse(sessao.Encerrada);
+            Assert.AreEqual(0, sessao.Ingressos.Count);
         }
 
         [TestMethod]
         public void Deve_Impedir_NumeroMaximoIngressos_Maior_Que_Capacidade()
         {
             var sessao = new Sessao(DateTime.Now.AddHours(1), 100, filme, sala);
-
             Assert.IsTrue(sessao.NumeroMaximoIngressos > sala.Capacidade);
         }
 
@@ -80,6 +81,16 @@ namespace ControleDeCinema.Testes.Unidade.ModuloSessao
             sessao.Encerrar();
 
             Assert.IsTrue(sessao.Encerrada);
+        }
+
+        [TestMethod]
+        public void ObterQuantidadeIngressosDisponiveis_DeveRetornarCorreto()
+        {
+            var sessao = new Sessao(DateTime.Now.AddHours(1), 3, filme, sala);
+            sessao.GerarIngresso(1, false);
+            sessao.GerarIngresso(2, true);
+
+            Assert.AreEqual(1, sessao.ObterQuantidadeIngressosDisponiveis());
         }
     }
 }
