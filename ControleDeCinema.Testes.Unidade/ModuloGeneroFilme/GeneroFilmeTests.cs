@@ -1,7 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using ControleDeCinema.Dominio.ModuloGeneroFilme;
-using ControleDeCinema.Infraestrutura.Orm.ModuloGeneroFilme;
-using ControleDeCinema.Infraestrutura.Orm.Compartilhado;
+﻿using ControleDeCinema.Dominio.ModuloGeneroFilme;
 
 namespace ControleDeCinema.Testes.Unidade.ModuloGeneroFilme;
 
@@ -9,50 +6,55 @@ namespace ControleDeCinema.Testes.Unidade.ModuloGeneroFilme;
 [TestCategory("Testes - Unidade - GeneroFilme")]
 public sealed class GeneroFilmeTests
 {
-    protected ControleDeCinemaDbContext? dbContext;
-    protected RepositorioGeneroFilmeEmOrm? repositorioGeneroFilme;
+    private GeneroFilme? genero;
+    protected IRepositorioGeneroFilme? repositorioGeneroFilme;
 
-    [TestInitialize]
-    public void ConfigurarTeste()
+    [TestMethod]
+    public void Deve_Impedir_Cadastro_Genero_Com_Descricao_Vazia()
     {
-        var options = new DbContextOptionsBuilder<ControleDeCinemaDbContext>()
-            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
-            .Options;
-        dbContext = new ControleDeCinemaDbContext(options);
-        dbContext.Database.EnsureCreated();
+        // Arrange
+        genero = new GeneroFilme("");
 
-        repositorioGeneroFilme = new RepositorioGeneroFilmeEmOrm(dbContext);
+        // Act
+        try
+        {
+            repositorioGeneroFilme?.Cadastrar(genero);
+        }
+        catch (Exception ex)
+        {
+            // Assert
+            Assert.IsInstanceOfType(ex, typeof(ArgumentException));
+            Assert.AreEqual("A descrição do gênero não pode estar vazia.", ex.Message);
+        }
     }
 
 
-    //Sistema não lança exceções para campos obrigatórios ou duplicados
-    //[TestMethod]
-    //public void Deve_Validar_Nome_Obrigatorio_E_Nome_Duplicado_Ao_Cadastrar_Genero()
-    //{
-    //    var repositorio = repositorioGeneroFilme ?? throw new InvalidOperationException("Repositorio não inicializado.");
+    [TestMethod]
+    public void Deve_Impedir_Cadastro_Genero_Com_Descricao_Duplicada()
+    {
+        // Arrange
+        var genero1 = new GeneroFilme("Ação");
+        var genero2 = new GeneroFilme("Comédia");
+        var genero3 = new GeneroFilme("Drama");
 
-    //    try
-    //    {
-    //        var generoInvalido = new GeneroFilme("");
-    //        Assert.Fail("Cadastro com nome vazio deveria lançar exceção.");
-    //    }
-    //    catch (ArgumentException ex)
-    //    {
-    //        Assert.AreEqual("O campo 'Nome' é obrigatório.", ex.Message);
-    //    }
+        repositorioGeneroFilme?.Cadastrar(genero1);
+        repositorioGeneroFilme?.Cadastrar(genero2);
+        repositorioGeneroFilme?.Cadastrar(genero3);
 
-    //    var generoOriginal = new GeneroFilme("Ação");
-    //    repositorio.Cadastrar(generoOriginal);
+        var listaGeneros = repositorioGeneroFilme?.SelecionarRegistros() ?? new List<GeneroFilme>();
 
-    //    try
-    //    {
-    //        var generoDuplicado = new GeneroFilme("Ação");
-    //        repositorio.Cadastrar(generoDuplicado);
-    //        Assert.Fail("Cadastro com nome duplicado deveria lançar exceção.");
-    //    }
-    //    catch (InvalidOperationException ex)
-    //    {
-    //        Assert.AreEqual("Já existe um gênero com esse nome.", ex.Message);
-    //    }
-    //}
+        // Act
+        var novoGenero = new GeneroFilme("Ação");
+        
+        try
+        {
+            repositorioGeneroFilme?.Cadastrar(novoGenero);
+        }
+        catch (Exception ex)
+        {
+            // Assert
+            Assert.IsInstanceOfType(ex, typeof(InvalidOperationException));
+            Assert.AreEqual("Já existe um gênero registrado com esta descrição.", ex.Message);
+        }
+    }
 }
