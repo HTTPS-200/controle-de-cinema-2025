@@ -16,7 +16,31 @@ internal class GeneroFilmeIndexPageObject
 
     public GeneroFilmeIndexPageObject IrPara(string enderecoBase)
     {
-        driver.Navigate().GoToUrl($"{enderecoBase}/GeneroFilme");
+        driver.Navigate().GoToUrl($"{enderecoBase}/generoFilme");
         return this;
+    }
+
+    public GeneroFilmeFormObjects ClickCadastrar()
+    {
+        wait.Until(d => d.FindElement(By.CssSelector("a[data-se='btnCadastrar']"))).Click();
+        return new GeneroFilmeFormObjects(driver);
+    }
+
+    public GeneroFilmeFormObjects ClickEditar()
+    {
+        wait.Until(d => d.FindElement(By.CssSelector(".card a[title='Edição']"))).Click();
+        return new GeneroFilmeFormObjects(driver);
+    }
+
+    public GeneroFilmeFormObjects ClickExcluir()
+    {
+        wait.Until(d => d.FindElement(By.CssSelector(".card a[title='Exclusão']"))).Click();
+        return new GeneroFilmeFormObjects(driver);
+    }
+
+    public bool ContemGenero(string nome)
+    {
+        wait.Until(d => d.FindElement(By.CssSelector("a[data-se='btnCadastrar']")).Displayed);
+        return driver.PageSource.Contains(nome);
     }
 }
