@@ -10,6 +10,8 @@ EXPOSE 8081
 
 # This stage is used to build the service project
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+ARG RESOURCE_REAPER_SESSION_ID="00000000-0000-0000-0000-000000000000"
+LABEL "org.testcontainers.resource-reaper-session"=$RESOURCE_REAPER_SESSION_ID
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["ControleDeCinema.WebApp/ControleDeCinema.WebApp.csproj", "ControleDeCinema.WebApp/"]
