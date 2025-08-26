@@ -35,7 +35,7 @@ public abstract class TestFixture
             .Build();
 
         network = new NetworkBuilder()
-            .WithName(Guid.NewGuid().ToString("D"))
+            .WithName(Guid.NewGuid().ToString())
             .WithCleanUp(true)
             .Build();
 
@@ -110,7 +110,7 @@ public abstract class TestFixture
         await imagem.CreateAsync().ConfigureAwait(false);
 
         var connectionStringRede = dbContainer?.GetConnectionString()
-            .Replace(dbContainer.Hostname, "controle-de-cinema-e2e")
+            .Replace(dbContainer.Hostname, "controle-de-cinema-e2e-testdb")
             .Replace(dbContainer.GetMappedPublicPort(dbPort).ToString(), dbPort.ToString());
 
         appContainer = new ContainerBuilder()
@@ -140,9 +140,9 @@ public abstract class TestFixture
             .WithImage("selenium/standalone-chrome:nightly")
             .WithPortBinding(seleniumPort, true)
             .WithNetwork(network)
-            .WithNetworkAliases("controle-de-cinema-e2e")
+            .WithNetworkAliases("controle-de-cinema-selenium-e2e")
             .WithExtraHost("host.docker.internal", "host-gateway")
-            .WithName("controle-de-cinema-e2e")
+            .WithName("controle-de-cinema-selenium-e2e")
             .WithWaitStrategy(Wait.ForUnixContainer()
                 .UntilPortIsAvailable(seleniumPort)
             )
