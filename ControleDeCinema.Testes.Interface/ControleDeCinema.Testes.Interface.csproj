@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ControleDeCinema.Infraestrutura.Orm\ControleDeCinema.Infraestrutura.Orm.csproj" />
+    <ProjectReference Include="..\ControleDeCinema.WebApp\ControleDeCinema.WebApp.csproj" />
   </ItemGroup>
 
 </Project>
