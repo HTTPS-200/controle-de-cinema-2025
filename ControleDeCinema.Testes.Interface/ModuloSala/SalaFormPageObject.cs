@@ -12,13 +12,13 @@ public class SalaFormPageObject
     {
         this.driver = driver;
 
-        wait = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
+        wait = new WebDriverWait(driver, TimeSpan.FromSeconds(30));
         wait.IgnoreExceptionTypes(typeof(StaleElementReferenceException), typeof(NoSuchElementException));
 
         try
         {
             wait.Until(d =>
-                d.FindElement(By.CssSelector(cssSelectorToFind: "form[data-se='form']")).Displayed);
+                d.FindElement(By.CssSelector(cssSelectorToFind: "form[data-se='formPrincipal']")).Displayed);
         }
         catch (WebDriverTimeoutException)
         {

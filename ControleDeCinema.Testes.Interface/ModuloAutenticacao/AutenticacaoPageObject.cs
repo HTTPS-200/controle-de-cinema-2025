@@ -1,5 +1,6 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
+using ControleDeCinema.Testes.Interface.Helpers; 
 
 namespace ControleDeCinema.Testes.Interface.Compartilhado;
 
@@ -24,43 +25,44 @@ public class AutenticacaoPageObject
     {
         driver.Navigate().GoToUrl($"{enderecoBase}/autenticacao/registro");
 
-        var inputEmail = driver.FindElement(By.CssSelector("input[data-se='inputEmail']"));
-        var inputSenha = driver.FindElement(By.CssSelector("input[data-se='inputSenha']"));
-        var inputConfirmarSenha = driver.FindElement(By.CssSelector("input[data-se='inputConfirmarSenha']"));
-        var selectTipoUsuario = new SelectElement(driver.FindElement(By.CssSelector("select[data-se='selectTipoUsuario']")));
+        TimeHelper.EsperarElemento(By.XPath("//*[contains(text(), 'Registro')]"), driver, 10);
 
-        inputEmail.Clear();
-        inputEmail.SendKeys(emailEmpresa);
+        var inputEmail = TimeHelper.EsperarElemento(By.CssSelector("input[data-se='inputEmail']"), driver, 10);
+        inputEmail?.Clear();
+        inputEmail?.SendKeys(emailEmpresa);
 
-        inputSenha.Clear();
-        inputSenha.SendKeys(senhaPadrao);
+        var inputSenha = TimeHelper.EsperarElemento(By.CssSelector("input[data-se='inputSenha']"), driver, 10);
+        inputSenha?.Clear();
+        inputSenha?.SendKeys(senhaPadrao);
 
-        inputConfirmarSenha.Clear();
-        inputConfirmarSenha.SendKeys(senhaPadrao);
+        var inputConfirmarSenha = TimeHelper.EsperarElemento(By.CssSelector("input[data-se='inputConfirmarSenha']"), driver, 10);
+        inputConfirmarSenha?.Clear();
+        inputConfirmarSenha?.SendKeys(senhaPadrao);
 
+        var selectElement = TimeHelper.EsperarElemento(By.CssSelector("select[data-se='selectTipoUsuario']"), driver, 10);
+        var selectTipoUsuario = new SelectElement(selectElement);
         selectTipoUsuario.SelectByText("Empresa");
 
         ConfirmarFormulario();
     }
-
     public void RegistrarContaCliente()
     {
         driver.Navigate().GoToUrl($"{enderecoBase}/autenticacao/registro");
 
-        var inputEmail = driver.FindElement(By.CssSelector("input[data-se='inputEmail']"));
-        var inputSenha = driver.FindElement(By.CssSelector("input[data-se='inputSenha']"));
-        var inputConfirmarSenha = driver.FindElement(By.CssSelector("input[data-se='inputConfirmarSenha']"));
-        var selectTipoUsuario = new SelectElement(driver.FindElement(By.CssSelector("select[data-se='selectTipoUsuario']")));
+        var inputEmail = TimeHelper.EsperarElemento(By.CssSelector("input[data-se='inputEmail']"), driver, 10);
+        inputEmail?.Clear();
+        inputEmail?.SendKeys(emailCliente);
 
-        inputEmail.Clear();
-        inputEmail.SendKeys(emailCliente);
+        var inputSenha = TimeHelper.EsperarElemento(By.CssSelector("input[data-se='inputSenha']"), driver, 10);
+        inputSenha?.Clear();
+        inputSenha?.SendKeys(senhaPadrao);
 
-        inputSenha.Clear();
-        inputSenha.SendKeys(senhaPadrao);
+        var inputConfirmarSenha = TimeHelper.EsperarElemento(By.CssSelector("input[data-se='inputConfirmarSenha']"), driver, 10);
+        inputConfirmarSenha?.Clear();
+        inputConfirmarSenha?.SendKeys(senhaPadrao);
 
-        inputConfirmarSenha.Clear();
-        inputConfirmarSenha.SendKeys(senhaPadrao);
-
+        var selectElement = TimeHelper.EsperarElemento(By.CssSelector("select[data-se='selectTipoUsuario']"), driver, 10);
+        var selectTipoUsuario = new SelectElement(selectElement);
         selectTipoUsuario.SelectByText("Cliente");
 
         ConfirmarFormulario();
@@ -70,14 +72,13 @@ public class AutenticacaoPageObject
     {
         driver.Navigate().GoToUrl($"{enderecoBase}/autenticacao/login");
 
-        var inputEmail = driver.FindElement(By.CssSelector("input[data-se='inputEmail']"));
-        var inputSenha = driver.FindElement(By.CssSelector("input[data-se='inputSenha']"));
+        var inputEmail = TimeHelper.EsperarElemento(By.CssSelector("input[data-se='inputEmail']"), driver, 10);
+        inputEmail?.Clear();
+        inputEmail?.SendKeys(tipoConta == "Cliente" ? emailCliente : emailEmpresa);
 
-        inputEmail.Clear();
-        inputEmail.SendKeys(tipoConta == "Cliente" ? emailCliente : emailEmpresa);
-
-        inputSenha.Clear();
-        inputSenha.SendKeys(senhaPadrao);
+        var inputSenha = TimeHelper.EsperarElemento(By.CssSelector("input[data-se='inputSenha']"), driver, 10);
+        inputSenha?.Clear();
+        inputSenha?.SendKeys(senhaPadrao);
 
         ConfirmarFormulario();
     }
