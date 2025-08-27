@@ -65,6 +65,10 @@ public abstract class TestFixture
         dbContext = ControleDeCinemaDbContextFactory.CriarDbContext(dbContainer.GetConnectionString());
 
         ConfigurarTabelas(dbContext);
+
+        var autenticacaoPage = new AutenticacaoPage(driver!);
+        autenticacaoPage.CriarUsuarioEmpresa("usuario@teste.com", "senhapodeserfraca");
+        autenticacaoPage.RealizarLogin(enderecoBase!, "usuario@teste.com", "senhapodeserfraca");
     }
 
     private static void ConfigurarTabelas(ControleDeCinemaDbContext dbContext)

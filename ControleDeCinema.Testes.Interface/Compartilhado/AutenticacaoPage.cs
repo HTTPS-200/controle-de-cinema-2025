@@ -1,67 +1,82 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
-
-namespace ControleDeCinema.Testes.Interface.Compartilhado;
+using Microsoft.EntityFrameworkCore;
+using ControleDeCinema.Infraestrutura.Orm.Compartilhado;
+using ControleDeCinema.Dominio.ModuloAutenticacao;
 
 public class AutenticacaoPage
 {
     private readonly IWebDriver driver;
     private readonly WebDriverWait wait;
 
-    public const string EmailEmpresa = "empresateste@gmail.com";
-    public const string SenhaEmpresa = "Teste123!";
-
     public AutenticacaoPage(IWebDriver driver)
     {
         this.driver = driver;
-        wait = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
+        wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
     }
 
-    public void RegistrarContaEmpresarial(string enderecoBase)
+    public void CriarUsuarioEmpresa(string usuario, string senha)
     {
-        driver.Navigate().GoToUrl($"{enderecoBase.TrimEnd('/')}/autenticacao/registro");
+        var options = new DbContextOptionsBuilder<ControleDeCinemaDbContext>()
+            .UseNpgsql("Host=localhost;Port=5432;Database=controle-de-cinema-db;Username=postgres;Password=MinhaSenhaFraca")
+            .Options;
 
-        IWebElement inputEmail = wait.Until(d => d.FindElement(By.CssSelector("input[data-se='inputEmail']")));
-        IWebElement inputSenha = driver.FindElement(By.CssSelector("input[data-se='inputSenha']"));
-        IWebElement inputConfirmarSenha = driver.FindElement(By.CssSelector("input[data-se='inputConfirmarSenha']"));
-        SelectElement selectTipoUsuario = new(driver.FindElement(By.CssSelector("select[data-se='selectTipoUsuario']")));
+        using var dbContext = new ControleDeCinemaDbContext(options);
 
-        inputEmail.Clear();
-        inputEmail.SendKeys(EmailEmpresa);
+        if (dbContext.Users.Any(u => u.Email == usuario))
+            return;
 
-        inputSenha.Clear();
-        inputSenha.SendKeys(SenhaEmpresa);
+        var novoUsuario = new Usuario
+        {
+            UserName = usuario,
+            Email = usuario,
+            EmailConfirmed = true
+        };
 
-        inputConfirmarSenha.Clear();
-        inputConfirmarSenha.SendKeys(SenhaEmpresa);
+        var passwordHasher = new Microsoft.AspNetCore.Identity.PasswordHasher<Usuario>();
+        novoUsuario.PasswordHash = passwordHasher.HashPassword(novoUsuario, senha);
 
-        selectTipoUsuario.SelectByText("Empresa");
+        dbContext.Users.Add(novoUsuario);
 
-        IWebElement btnConfirmar = wait.Until(d => d.FindElement(By.CssSelector("button[data-se='btnConfirmar']")));
-        btnConfirmar.Click();
+        var empresaRole = dbContext.Roles.FirstOrDefault(r => r.Name == "Empresa");
+        if (empresaRole == null)
+        {
+            empresaRole = new Cargo
+            {
+                Name = "Empresa",
+                NormalizedName = "EMPRESA"
+                // Add other properties as needed
+            };
 
-        wait.Until(d =>
-            !d.Url.Contains("/autenticacao/registro", StringComparison.OrdinalIgnoreCase) &&
-            d.FindElements(By.CssSelector("form[action='/autenticacao/logout']")).Count > 0
-        );
+            dbContext.Roles.Add(empresaRole);
+            dbContext.SaveChanges();
+        }
+
+        dbContext.UserRoles.Add(new Microsoft.AspNetCore.Identity.IdentityUserRole<Guid>
+        {
+            UserId = novoUsuario.Id,
+            RoleId = empresaRole.Id
+        });
+
+        dbContext.SaveChanges();
     }
 
-    public void Login(string enderecoBase, string email, string senha)
+    public void RealizarLogin(string enderecoBase, string usuario, string senha)
     {
-        driver.Navigate().GoToUrl($"{enderecoBase.TrimEnd('/')}/autenticacao/login");
+        driver.Navigate().GoToUrl($"{enderecoBase}/autenticacao/login");
 
-        IWebElement inputEmail = wait.Until(d => d.FindElement(By.CssSelector("input[name='Email']")));
-        IWebElement inputSenha = driver.FindElement(By.CssSelector("input[name='Senha']"));
-        IWebElement btnLogin = driver.FindElement(By.CssSelector("button[type='submit']"));
+        var inputUsuario = wait.Until(d => d.FindElement(By.Id("Input_Email")));
+        var inputSenha = driver.FindElement(By.Id("Input_Senha"));
+        var btnLogin = driver.FindElement(By.CssSelector("button[type='submit']"));
 
-        inputEmail.Clear();
-        inputEmail.SendKeys(email);
+        inputUsuario.Clear();
+        inputUsuario.SendKeys(usuario);
 
         inputSenha.Clear();
         inputSenha.SendKeys(senha);
 
         btnLogin.Click();
 
-        wait.Until(d => d.FindElements(By.CssSelector("form[action='/autenticacao/logout']")).Count > 0);
+        wait.Until(d => d.FindElement(By.Id("menuUsuario")).Displayed);
     }
 }

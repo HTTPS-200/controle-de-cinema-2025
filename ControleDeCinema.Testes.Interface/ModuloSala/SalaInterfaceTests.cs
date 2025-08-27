@@ -9,14 +9,14 @@ public sealed class SalaInterfaceTests : TestFixture
 {
     private AutenticacaoPage autenticacaoPage;
     [TestInitialize]
-    public void InicializarTeste()
-    {
-        base.InicializarTeste();
+    //public void InicializarTeste()
+    //{
+    //    base.InicializarTeste();
 
-        autenticacaoPage = new AutenticacaoPage(driver);
+    //    autenticacaoPage = new AutenticacaoPage(driver);
 
-        autenticacaoPage.RegistrarContaEmpresarial(enderecoBase);
-    }
+    //    autenticacaoPage.RegistrarContaEmpresarial(enderecoBase);
+    //}
 
     [TestMethod]
     public void CT007_Deve_Cadastrar_Sala_Corretamente()
