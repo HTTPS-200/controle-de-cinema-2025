@@ -11,9 +11,20 @@ public class SalaFormPageObject
     public SalaFormPageObject(IWebDriver driver)
     {
         this.driver = driver;
-        wait = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
 
-        wait.Until(d => d.FindElement(By.CssSelector("form[data-se='form']")).Displayed);
+        wait = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
+        wait.IgnoreExceptionTypes(typeof(StaleElementReferenceException), typeof(NoSuchElementException));
+
+        try
+        {
+            wait.Until(d =>
+                d.FindElement(By.CssSelector(cssSelectorToFind: "form[data-se='form']")).Displayed);
+        }
+        catch (WebDriverTimeoutException)
+        {
+            DumpOnFailure(driver, "sala-timeout");
+            throw;
+        }
     }
 
     public SalaFormPageObject PreencherNumero(string numero)
@@ -57,5 +68,19 @@ public class SalaFormPageObject
         wait.Until(d => d.FindElement(By.CssSelector("a[data-se='btnCadastrar']")).Displayed);
 
         return new SalaIndexPageObject(driver);
+    }
+
+    private static void DumpOnFailure(IWebDriver driver, string prefix)
+    {
+        try
+        {
+            Screenshot shot = ((ITakesScreenshot)driver).GetScreenshot();
+            string png = Path.Combine(Path.GetTempPath(), $"{prefix}-{DateTime.Now:HHmmss}.png");
+            shot.SaveAsFile(png);
+
+            string html = Path.Combine(Path.GetTempPath(), $"{prefix}-{DateTime.Now:HHmmss}.html");
+            File.WriteAllText(html, driver.PageSource);
+        }
+        catch { /* best-effort */ }
     }
 }

@@ -11,7 +11,9 @@ public class SalaIndexPageObject
     public SalaIndexPageObject(IWebDriver driver)
     {
         this.driver = driver;
+
         wait = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
+        wait.IgnoreExceptionTypes(typeof(StaleElementReferenceException), typeof(NoSuchElementException));
     }
 
     public SalaIndexPageObject IrPara(string enderecoBase)

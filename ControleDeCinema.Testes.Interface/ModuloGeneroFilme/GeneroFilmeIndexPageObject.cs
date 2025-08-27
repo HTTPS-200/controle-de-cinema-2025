@@ -2,7 +2,7 @@
 using OpenQA.Selenium.Support.UI;
 
 namespace ControleDeCinema.Testes.Interface.ModuloGeneroFilme;
-internal class GeneroFilmeIndexPageObject
+public class GeneroFilmeIndexPageObject
 {
     private readonly IWebDriver driver;
     private readonly WebDriverWait wait;
