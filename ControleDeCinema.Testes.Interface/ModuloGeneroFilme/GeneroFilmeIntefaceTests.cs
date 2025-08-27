@@ -7,6 +7,19 @@ namespace ControleDeCinema.Testes.Interface.ModuloGeneroFilme;
 [TestCategory("Tests de Interface de GeneroFilme")]
 public sealed class GeneroFilmeIntefaceTests : TestFixture
 {
+    protected AutenticacaoPageObject autenticacaoPage;
+
+    [TestInitialize]
+    public void InicializarTeste()
+    {
+        base.InicializarTeste();
+
+        autenticacaoPage = new AutenticacaoPageObject(driver!, enderecoBase!);
+
+        autenticacaoPage.RegistrarContaEmpresarial();
+    }
+
+
     [TestMethod]
     public void Deve_Cadastrar_GeneroFilme_Corretamente()
     {
