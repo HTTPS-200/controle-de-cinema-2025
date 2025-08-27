@@ -65,8 +65,8 @@ public class AutenticacaoPage
     {
         driver.Navigate().GoToUrl($"{enderecoBase}/autenticacao/login");
 
-        var inputUsuario = wait.Until(d => d.FindElement(By.Id("Input_Email")));
-        var inputSenha = driver.FindElement(By.Id("Input_Senha"));
+        var inputUsuario = wait.Until(d => d.FindElement(By.Id("button[type='Email']")));
+        var inputSenha = driver.FindElement(By.Id("button[type='Senha']"));
         var btnLogin = driver.FindElement(By.CssSelector("button[type='submit']"));
 
         inputUsuario.Clear();
