@@ -63,7 +63,8 @@ public class AutenticacaoPage
 
     public void RealizarLogin(string enderecoBase, string usuario, string senha)
     {
-        driver.Navigate().GoToUrl($"{enderecoBase}/autenticacao/login");
+        driver.Navigate().GoToUrl($"{enderecoBase}autentificacao");
+        driver.FindElement(By.Id("linkLogin")).Click();
 
         var inputUsuario = wait.Until(d => d.FindElement(By.Id("button[type='Email']")));
         var inputSenha = driver.FindElement(By.Id("button[type='Senha']"));
@@ -77,6 +78,6 @@ public class AutenticacaoPage
 
         btnLogin.Click();
 
-        wait.Until(d => d.FindElement(By.Id("menuUsuario")).Displayed);
+        wait.Until(d => d.FindElement(By.Id("Usuario")).Displayed);
     }
 }
