@@ -1,5 +1,5 @@
 ﻿using ControleDeCinema.Testes.Interface.Compartilhado;
-using Docker.DotNet.Models;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace TesteFacil.Testes.Interface.ModuloSala;
 
@@ -7,11 +7,22 @@ namespace TesteFacil.Testes.Interface.ModuloSala;
 [TestCategory("Tests de Interface de Sala")]
 public sealed class SalaInterfaceTests : TestFixture
 {
+    private AutenticacaoPage autenticacaoPage;
+    [TestInitialize]
+    public void InicializarTeste()
+    {
+        base.InicializarTeste();
+
+        autenticacaoPage = new AutenticacaoPage(driver);
+
+        autenticacaoPage.RegistrarContaEmpresarial(enderecoBase);
+    }
+
     [TestMethod]
     public void CT007_Deve_Cadastrar_Sala_Corretamente()
     {
-        var indexPage = new SalaIndexPageObject(driver!)
-            .IrPara(enderecoBase!);
+        var indexPage = new SalaIndexPageObject(driver)
+            .IrPara(enderecoBase);
 
         indexPage
             .ClickCadastrar()
@@ -25,8 +36,8 @@ public sealed class SalaInterfaceTests : TestFixture
     [TestMethod]
     public void CT008_Deve_Editar_Sala_Corretamente()
     {
-        var indexPage = new SalaIndexPageObject(driver!)
-            .IrPara(enderecoBase!);
+        var indexPage = new SalaIndexPageObject(driver)
+            .IrPara(enderecoBase);
 
         indexPage
             .ClickCadastrar()
@@ -46,8 +57,8 @@ public sealed class SalaInterfaceTests : TestFixture
     [TestMethod]
     public void CT009_Deve_Excluir_Sala_Corretamente()
     {
-        var indexPage = new SalaIndexPageObject(driver!)
-            .IrPara(enderecoBase!);
+        var indexPage = new SalaIndexPageObject(driver)
+            .IrPara(enderecoBase);
 
         indexPage
             .ClickCadastrar()
@@ -65,8 +76,8 @@ public sealed class SalaInterfaceTests : TestFixture
     [TestMethod]
     public void CT010_Deve_Listar_Todas_As_Salas()
     {
-        var indexPage = new SalaIndexPageObject(driver!)
-            .IrPara(enderecoBase!);
+        var indexPage = new SalaIndexPageObject(driver)
+            .IrPara(enderecoBase);
 
         indexPage
             .ClickCadastrar()

@@ -11,33 +11,49 @@ public class SalaFormPageObject
     public SalaFormPageObject(IWebDriver driver)
     {
         this.driver = driver;
-        wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+        wait = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
 
-        wait.Until(d => d.FindElement(By.CssSelector("form")).Displayed);
+        wait.Until(d => d.FindElement(By.CssSelector("form[data-se='form']")).Displayed);
     }
 
     public SalaFormPageObject PreencherNumero(string numero)
     {
-        var inputNumero = driver.FindElement(By.Id("Numero"));
-        inputNumero.Clear();
-        inputNumero.SendKeys(numero);
+        var input = wait.Until(d =>
+        {
+            var element = d.FindElement(By.CssSelector("input[data-se='inputNumero']"));
+            return element.Displayed && element.Enabled ? element : null;
+        });
 
+        input.Clear();
+        input.SendKeys(numero);
         return this;
     }
 
     public SalaFormPageObject PreencherCapacidade(string capacidade)
     {
-        var inputCapacidade = driver.FindElement(By.Id("Capacidade"));
-        inputCapacidade.Clear();
-        inputCapacidade.SendKeys(capacidade);
+        var input = wait.Until(d =>
+        {
+            var element = d.FindElement(By.CssSelector("input[data-se='inputCapacidade']"));
+            return element.Displayed && element.Enabled ? element : null;
+        });
 
+        input.Clear();
+        input.SendKeys(capacidade);
         return this;
     }
 
     public SalaIndexPageObject Confirmar()
     {
-        wait.Until(d => d.FindElement(By.CssSelector("button[type='submit']"))).Click();
+        var button = wait.Until(d =>
+        {
+            var element = d.FindElement(By.CssSelector("button[data-se='btnConfirmar']"));
+            return element.Displayed && element.Enabled ? element : null;
+        });
 
+        button.Click();
+
+        // Wait for redirect to index page
+        wait.Until(d => d.Url.Contains("/salas", StringComparison.OrdinalIgnoreCase));
         wait.Until(d => d.FindElement(By.CssSelector("a[data-se='btnCadastrar']")).Displayed);
 
         return new SalaIndexPageObject(driver);

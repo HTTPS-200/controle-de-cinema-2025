@@ -11,12 +11,14 @@ public class SalaIndexPageObject
     public SalaIndexPageObject(IWebDriver driver)
     {
         this.driver = driver;
-        wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+        wait = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
     }
 
     public SalaIndexPageObject IrPara(string enderecoBase)
     {
-        driver.Navigate().GoToUrl(Path.Combine(enderecoBase, "salas"));
+        driver.Navigate().GoToUrl($"{enderecoBase.TrimEnd('/')}/salas");
+        wait.Until(d => d.Url.Contains("/salas", StringComparison.OrdinalIgnoreCase));
+        wait.Until(d => d.FindElement(By.CssSelector("a[data-se='btnCadastrar']")).Displayed);
         return this;
     }
 
@@ -28,19 +30,22 @@ public class SalaIndexPageObject
 
     public SalaFormPageObject ClickEditar()
     {
-        wait.Until(d => d.FindElement(By.CssSelector(".card a[title='Edição']"))).Click();
+        wait.Until(d => d.FindElement(By.CssSelector("a[data-se='btnEditar']"))).Click();
         return new SalaFormPageObject(driver);
     }
 
     public SalaFormPageObject ClickExcluir()
     {
-        wait.Until(d => d.FindElement(By.CssSelector(".card a[title='Exclusão']"))).Click();
+        wait.Until(d => d.FindElement(By.CssSelector("a[data-se='btnExcluir']"))).Click();
         return new SalaFormPageObject(driver);
     }
 
     public bool ContemSala(string numero)
     {
-        wait.Until(d => d.FindElement(By.CssSelector("a[data-se='btnCadastrar']")).Displayed);
-        return driver.PageSource.Contains(numero);
+        return wait.Until(d =>
+        {
+            var cells = d.FindElements(By.CssSelector("table tbody tr td"));
+            return cells.Any(c => c.Text.Contains(numero));
+        });
     }
 }
