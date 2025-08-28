@@ -16,17 +16,15 @@ public class GeneroFilmeFormObjects
 
     public GeneroFilmeFormObjects PreencherNome(string nome)
     {
-        var inputNome = driver.FindElement(By.Id("nome"));
-        inputNome.Clear();
-        inputNome.SendKeys(nome);
+        var campoNome = wait.Until(d => d.FindElement(By.CssSelector("input[data-se='txtNome']")));
+        campoNome.Clear();
+        campoNome.SendKeys(nome);
         return this;
     }
 
     public GeneroFilmeIndexPageObject Confirmar()
     {
-        wait.Until(d => d.FindElement(By.CssSelector("button[type='submit']"))).Click();
-        wait.Until(d => d.FindElement(By.CssSelector("a[data-se='btnCadastrar']")).Displayed);
+        wait.Until(d => d.FindElement(By.CssSelector("button[data-se='btnConfirmar']"))).Click();
         return new GeneroFilmeIndexPageObject(driver);
-
     }
 }
