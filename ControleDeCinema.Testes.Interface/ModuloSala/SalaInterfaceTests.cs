@@ -1,5 +1,7 @@
 ﻿using ControleDeCinema.Testes.Interface.Compartilhado;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using OpenQA.Selenium.Support.UI;
+using OpenQA.Selenium;
 
 namespace TesteFacil.Testes.Interface.ModuloSala;
 
@@ -16,7 +18,7 @@ public sealed class SalaInterfaceTests : TestFixture
 
         autenticacaoPage = new AutenticacaoPageObject(driver!, enderecoBase!);
         autenticacaoPage.RegistrarContaEmpresarial();
-        autenticacaoPage.FazerLogin("Empresa");
+        //autenticacaoPage.FazerLogin("Empresa");
     }
 
     [TestMethod]
@@ -35,48 +37,70 @@ public sealed class SalaInterfaceTests : TestFixture
     [TestMethod]
     public void CT008_Deve_Editar_Sala_Corretamente()
     {
-        var salaIndex = new SalaIndexPageObject(driver!).IrPara(enderecoBase!);
-        var salaForm = salaIndex.ClickCadastrar()
-                                 .PreencherNumero("102")
-                                 .PreencherCapacidade("80")
-                                 .Confirmar();
+        var salaIndex = new SalaIndexPageObject(driver!);
 
-        salaIndex = new SalaIndexPageObject(driver!).IrPara(enderecoBase!);
-        salaForm = salaIndex.ClickEditar()
-                            .PreencherNumero("102-A")
-                            .PreencherCapacidade("90")
-                            .Confirmar();
+        salaIndex
+            .IrPara(enderecoBase!)
+            .ClickCadastrar()
+            .PreencherNumero("5")
+            .PreencherCapacidade("50")
+            .Confirmar();
 
-        salaIndex = new SalaIndexPageObject(driver!).IrPara(enderecoBase!);
-        Assert.IsTrue(salaIndex.ContemSala("102-A"));
+        var salaForm = salaIndex
+            .IrPara(enderecoBase!)
+            .ClickEditar();
+
+        salaForm
+            .PreencherNumero("7")
+            .PreencherCapacidade("60")
+            .Confirmar();
+
+        Assert.IsTrue(salaIndex.ContemSala("7"));
     }
 
     [TestMethod]
     public void CT009_Deve_Excluir_Sala_Corretamente()
     {
-        var salaIndex = new SalaIndexPageObject(driver!).IrPara(enderecoBase!);
-        var salaForm = salaIndex.ClickCadastrar()
-                                 .PreencherNumero("103")
-                                 .PreencherCapacidade("70")
-                                 .Confirmar();
+        var salaIndex = new SalaIndexPageObject(driver!);
 
-        salaIndex = new SalaIndexPageObject(driver!).IrPara(enderecoBase!);
-        salaForm = salaIndex.ClickExcluir().Confirmar();
+        salaIndex
+            .IrPara(enderecoBase!)
+            .ClickCadastrar()
+            .PreencherNumero("9")
+            .PreencherCapacidade("100")
+            .Confirmar();
 
-        salaIndex = new SalaIndexPageObject(driver!).IrPara(enderecoBase!);
-        Assert.IsFalse(salaIndex.ContemSala("103"));
+        var salaForm = salaIndex
+            .IrPara(enderecoBase!)
+            .ClickExcluir();
+
+        salaForm.Confirmar();
+
+        Assert.IsFalse(salaIndex.ContemSala("9"));
     }
 
     [TestMethod]
     public void CT010_Deve_Listar_Todas_As_Salas()
     {
-        var salaIndex = new SalaIndexPageObject(driver!).IrPara(enderecoBase!);
-        var salaForm = salaIndex.ClickCadastrar()
-                                 .PreencherNumero("104")
-                                 .PreencherCapacidade("100")
-                                 .Confirmar();
+        var salaIndex = new SalaIndexPageObject(driver!);
 
-        salaIndex = new SalaIndexPageObject(driver!).IrPara(enderecoBase!);
-        Assert.IsTrue(salaIndex.ContemSala("104"));
+        salaIndex
+            .IrPara(enderecoBase!)
+            .ClickCadastrar()
+            .PreencherNumero("1")
+            .PreencherCapacidade("30")
+            .Confirmar();
+
+        salaIndex
+            .IrPara(enderecoBase!)
+            .ClickCadastrar()
+            .PreencherNumero("2")
+            .PreencherCapacidade("40")
+            .Confirmar();
+
+        salaIndex.IrPara(enderecoBase!);
+
+        Assert.IsTrue(salaIndex.ContemSala("1"));
+        Assert.IsTrue(salaIndex.ContemSala("2"));
     }
 }

@@ -18,7 +18,7 @@ public class SalaFormPageObject
         try
         {
             wait.Until(d =>
-                d.FindElement(By.CssSelector(cssSelectorToFind: "form[data-se='formPrincipal']")).Displayed);
+                d.FindElement(By.CssSelector(cssSelectorToFind: "form[data-se='form']")).Displayed);
         }
         catch (WebDriverTimeoutException)
         {
@@ -55,19 +55,11 @@ public class SalaFormPageObject
 
     public SalaIndexPageObject Confirmar()
     {
-        var button = wait.Until(d =>
-        {
-            var element = d.FindElement(By.CssSelector("button[data-se='btnConfirmar']"));
-            return element.Displayed && element.Enabled ? element : null;
-        });
-
-        button.Click();
-
-        // Wait for redirect to index page
+        wait.Until(d => d.FindElement(By.CssSelector("button[data-se='btnConfirmar']"))).Click();
         wait.Until(d => d.Url.Contains("/salas", StringComparison.OrdinalIgnoreCase));
         wait.Until(d => d.FindElement(By.CssSelector("a[data-se='btnCadastrar']")).Displayed);
 
-        return new SalaIndexPageObject(driver);
+        return new(driver);
     }
 
     private static void DumpOnFailure(IWebDriver driver, string prefix)

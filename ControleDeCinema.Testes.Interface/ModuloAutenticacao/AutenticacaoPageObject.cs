@@ -25,77 +25,27 @@ public class AutenticacaoPageObject
     {
         driver.Navigate().GoToUrl($"{enderecoBase}/autenticacao/registro");
 
-        TimeHelper.EsperarElemento(By.XPath("//*[contains(text(), 'Registro')]"), driver, 10);
+        IWebElement inputEmail = driver.FindElement(By.CssSelector("input[data-se='inputEmail']"));
+        IWebElement inputSenha = driver.FindElement(By.CssSelector("input[data-se='inputSenha']"));
+        IWebElement inputConfirmarSenha = driver.FindElement(By.CssSelector("input[data-se='inputConfirmarSenha']"));
+        SelectElement selectTipoUsuario = new(driver.FindElement(By.CssSelector("select[data-se='selectTipoUsuario']")));
 
-        var inputEmail = TimeHelper.EsperarElemento(By.CssSelector("input[data-se='inputEmail']"), driver, 10);
-        inputEmail?.Clear();
-        inputEmail?.SendKeys(emailEmpresa);
+        inputEmail.Clear();
+        inputEmail.SendKeys(emailEmpresa);
 
-        var inputSenha = TimeHelper.EsperarElemento(By.CssSelector("input[data-se='inputSenha']"), driver, 10);
-        inputSenha?.Clear();
-        inputSenha?.SendKeys(senhaPadrao);
+        inputSenha.Clear();
+        inputSenha.SendKeys(senhaPadrao);
 
-        var inputConfirmarSenha = TimeHelper.EsperarElemento(By.CssSelector("input[data-se='inputConfirmarSenha']"), driver, 10);
-        inputConfirmarSenha?.Clear();
-        inputConfirmarSenha?.SendKeys(senhaPadrao);
+        inputConfirmarSenha.Clear();
+        inputConfirmarSenha.SendKeys(senhaPadrao);
 
-        var selectElement = TimeHelper.EsperarElemento(By.CssSelector("select[data-se='selectTipoUsuario']"), driver, 10);
-        var selectTipoUsuario = new SelectElement(selectElement);
         selectTipoUsuario.SelectByText("Empresa");
 
-        ConfirmarFormulario();
-    }
-    public void RegistrarContaCliente()
-    {
-        driver.Navigate().GoToUrl($"{enderecoBase}/autenticacao/registro");
+        WebDriverWait wait = new(driver, TimeSpan.FromSeconds(20));
 
-        var inputEmail = TimeHelper.EsperarElemento(By.CssSelector("input[data-se='inputEmail']"), driver, 10);
-        inputEmail?.Clear();
-        inputEmail?.SendKeys(emailCliente);
-
-        var inputSenha = TimeHelper.EsperarElemento(By.CssSelector("input[data-se='inputSenha']"), driver, 10);
-        inputSenha?.Clear();
-        inputSenha?.SendKeys(senhaPadrao);
-
-        var inputConfirmarSenha = TimeHelper.EsperarElemento(By.CssSelector("input[data-se='inputConfirmarSenha']"), driver, 10);
-        inputConfirmarSenha?.Clear();
-        inputConfirmarSenha?.SendKeys(senhaPadrao);
-
-        var selectElement = TimeHelper.EsperarElemento(By.CssSelector("select[data-se='selectTipoUsuario']"), driver, 10);
-        var selectTipoUsuario = new SelectElement(selectElement);
-        selectTipoUsuario.SelectByText("Cliente");
-
-        ConfirmarFormulario();
-    }
-
-    public void FazerLogin(string tipoConta)
-    {
-        driver.Navigate().GoToUrl($"{enderecoBase}/autenticacao/login");
-
-        var inputEmail = TimeHelper.EsperarElemento(By.CssSelector("input[data-se='inputEmail']"), driver, 10);
-        inputEmail?.Clear();
-        inputEmail?.SendKeys(tipoConta == "Cliente" ? emailCliente : emailEmpresa);
-
-        var inputSenha = TimeHelper.EsperarElemento(By.CssSelector("input[data-se='inputSenha']"), driver, 10);
-        inputSenha?.Clear();
-        inputSenha?.SendKeys(senhaPadrao);
-
-        ConfirmarFormulario();
-    }
-
-    public void FazerLogout()
-    {
-        driver.Navigate().GoToUrl(enderecoBase);
-
-        wait.Until(d => d.FindElements(By.CssSelector("form[action='/autenticacao/logout']")).Count > 0);
-        wait.Until(d => d.FindElement(By.CssSelector("form[action='/autenticacao/logout']"))).Submit();
-    }
-
-    private void ConfirmarFormulario()
-    {
         wait.Until(d =>
         {
-            var btn = d.FindElement(By.CssSelector("button[data-se='btnConfirmar']"));
+            IWebElement btn = d.FindElement(By.CssSelector("button[data-se='btnConfirmar']"));
             if (!btn.Enabled || !btn.Displayed) return false;
             btn.Click();
             return true;
@@ -103,9 +53,109 @@ public class AutenticacaoPageObject
 
         wait.Until(d =>
             !d.Url.Contains("/autenticacao/registro", StringComparison.OrdinalIgnoreCase) &&
-            !d.Url.Contains("/autenticacao/login", StringComparison.OrdinalIgnoreCase)
+            d.FindElements(By.CssSelector("form[action='/autenticacao/registro']")).Count == 0
         );
 
         wait.Until(d => d.FindElements(By.CssSelector("form[action='/autenticacao/logout']")).Count > 0);
     }
+    public void RegistrarContaCliente()
+    {
+        driver.Navigate().GoToUrl($"{enderecoBase}/autenticacao/registro");
+
+        IWebElement inputEmail = driver.FindElement(By.CssSelector("input[data-se='inputEmail']"));
+        IWebElement inputSenha = driver.FindElement(By.CssSelector("input[data-se='inputSenha']"));
+        IWebElement inputConfirmarSenha = driver.FindElement(By.CssSelector("input[data-se='inputConfirmarSenha']"));
+        SelectElement selectTipoUsuario = new(driver.FindElement(By.CssSelector("select[data-se='selectTipoUsuario']")));
+
+        inputEmail.Clear();
+        inputEmail.SendKeys(emailCliente);
+
+        inputSenha.Clear();
+        inputSenha.SendKeys(senhaPadrao);
+
+        inputConfirmarSenha.Clear();
+        inputConfirmarSenha.SendKeys(senhaPadrao);
+
+        selectTipoUsuario.SelectByText("Cliente");
+
+        WebDriverWait wait = new(driver, TimeSpan.FromSeconds(20));
+
+        wait.Until(d =>
+        {
+            IWebElement btn = d.FindElement(By.CssSelector("button[data-se='btnConfirmar']"));
+            if (!btn.Enabled || !btn.Displayed) return false;
+            btn.Click();
+            return true;
+        });
+
+        wait.Until(d =>
+            !d.Url.Contains("/autenticacao/registro", StringComparison.OrdinalIgnoreCase) &&
+            d.FindElements(By.CssSelector("form[action='/autenticacao/registro']")).Count == 0
+        );
+
+        wait.Until(d => d.FindElements(By.CssSelector("form[action='/autenticacao/logout']")).Count > 0);
+    }
+
+    public void FazerLogin(string tipoConta)
+    {
+        driver.Navigate().GoToUrl($"{enderecoBase}/autenticacao/login");
+
+        IWebElement inputEmail = driver.FindElement(By.CssSelector("input[data-se='inputEmail']"));
+        IWebElement inputSenha = driver.FindElement(By.CssSelector("input[data-se='inputSenha']"));
+
+        inputEmail.Clear();
+        if (tipoConta == "Cliente")
+            inputEmail.SendKeys(emailCliente);
+        else if (tipoConta == "Empresa")
+            inputEmail.SendKeys(emailEmpresa);
+
+
+        inputSenha.Clear();
+        inputSenha.SendKeys(senhaPadrao);
+
+        WebDriverWait wait = new(driver, TimeSpan.FromSeconds(20));
+
+        wait.Until(d =>
+        {
+            IWebElement btn = d.FindElement(By.CssSelector("button[data-se='btnConfirmar']"));
+            if (!btn.Enabled || !btn.Displayed) return false;
+            btn.Click();
+            return true;
+        });
+
+        wait.Until(d =>
+            !d.Url.Contains("/autenticacao/registro", StringComparison.OrdinalIgnoreCase) &&
+            d.FindElements(By.CssSelector("form[action='/autenticacao/registro']")).Count == 0
+        );
+
+        wait.Until(d => d.FindElements(By.CssSelector("form[action='/autenticacao/logout']")).Count > 0);
+    }
+
+    public void FazerLogout()
+    {
+        driver.Navigate().GoToUrl($"{enderecoBase}");
+
+        WebDriverWait wait = new(driver, TimeSpan.FromSeconds(5));
+
+        wait.Until(d => d.FindElements(By.CssSelector("form[action='/autenticacao/logout']")).Count > 0);
+        wait.Until(d => d.FindElement(By.CssSelector("form[action='/autenticacao/logout']"))).Submit();
+    }
+
+    //private void ConfirmarFormulario()
+    //{
+    //    wait.Until(d =>
+    //    {
+    //        var btn = d.FindElement(By.CssSelector("button[data-se='btnConfirmar']"));
+    //        if (!btn.Enabled || !btn.Displayed) return false;
+    //        btn.Click();
+    //        return true;
+    //    });
+
+    //    wait.Until(d =>
+    //        !d.Url.Contains("/autenticacao/registro", StringComparison.OrdinalIgnoreCase) &&
+    //        !d.Url.Contains("/autenticacao/login", StringComparison.OrdinalIgnoreCase)
+    //    );
+
+    //    wait.Until(d => d.FindElements(By.CssSelector("form[action='/autenticacao/logout']")).Count > 0);
+    //}
 }
