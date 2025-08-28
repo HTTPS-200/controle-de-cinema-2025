@@ -16,7 +16,7 @@ public class GeneroFilmeIndexPageObject
 
     public GeneroFilmeIndexPageObject IrPara(string enderecoBase)
     {
-        driver.Navigate().GoToUrl($"{enderecoBase}/generoFilme");
+        driver.Navigate().GoToUrl($"{enderecoBase}/generos");
         return this;
     }
 

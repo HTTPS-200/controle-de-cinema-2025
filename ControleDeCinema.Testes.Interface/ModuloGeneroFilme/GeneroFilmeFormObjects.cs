@@ -11,7 +11,7 @@ public class GeneroFilmeFormObjects
     {
         this.driver = driver;
         wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-        wait.Until(d => d.FindElement(By.CssSelector("form")).Displayed);
+        wait.Until(d => d.FindElement(By.CssSelector("form[data-se='formPrincipal']")).Displayed);
     }
 
     public GeneroFilmeFormObjects PreencherNome(string nome)

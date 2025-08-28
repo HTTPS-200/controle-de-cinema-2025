@@ -1,4 +1,5 @@
-﻿using ControleDeCinema.Infraestrutura.Orm.Compartilhado;
+﻿using ControleDeCinema.Dominio.ModuloAutenticacao;
+using ControleDeCinema.Infraestrutura.Orm.Compartilhado;
 using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Containers;
 using Microsoft.Extensions.Configuration;
@@ -65,6 +66,44 @@ public abstract class TestFixture
         dbContext = ControleDeCinemaDbContextFactory.CriarDbContext(dbContainer.GetConnectionString());
 
         ConfigurarTabelas(dbContext);
+
+        var usuarioEmpresa = "empresa@teste.com";
+        var senhaEmpresa = "SenhaSegura123";
+
+        if (!dbContext.Users.Any(u => u.Email == usuarioEmpresa))
+        {
+            var novoUsuario = new Usuario
+            {
+                UserName = usuarioEmpresa,
+                Email = usuarioEmpresa,
+                EmailConfirmed = true
+            };
+
+            var SenhaHash = new Microsoft.AspNetCore.Identity.PasswordHasher<Usuario>();
+            novoUsuario.PasswordHash = SenhaHash.HashPassword(novoUsuario, senhaEmpresa);
+
+            dbContext.Users.Add(novoUsuario);
+
+            var empresaRole = dbContext.Roles.FirstOrDefault(r => r.Name == "Empresa");
+            if (empresaRole == null)
+            {
+                empresaRole = new Cargo
+                {
+                    Name = "Empresa",
+                    NormalizedName = "EMPRESA"
+                };
+                dbContext.Roles.Add(empresaRole);
+                dbContext.SaveChanges();
+            }
+
+            dbContext.UserRoles.Add(new Microsoft.AspNetCore.Identity.IdentityUserRole<Guid>
+            {
+                UserId = novoUsuario.Id,
+                RoleId = empresaRole.Id
+            });
+
+            dbContext.SaveChanges();
+        }
     }
 
     private static void ConfigurarTabelas(ControleDeCinemaDbContext dbContext)
