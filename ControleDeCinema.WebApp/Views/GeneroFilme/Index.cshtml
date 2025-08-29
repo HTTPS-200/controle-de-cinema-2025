@@ -27,13 +27,13 @@
     </div>
 }
 
-<div class="row g-1" data-se="contemGenero">
+<div class="row g-1">
     @foreach (var registro in Model.Registros)
     {
         <div class="col-12 col-md-3">
             <div class="card border-0">
                 <div class="card-body">
-                    <h5 class="card-title" data-se="contemGenero">@registro.Descricao</h5>
+                    <h5 class="card-title">@registro.Descricao</h5>
 
                     <span class="d-flex gap-1 justify-content-end mt-4">
                         <a asp-action="Detalhes" asp-route-id="@registro.Id" class="btn btn-secondary rounded-circle card-option" title="Detalhes">

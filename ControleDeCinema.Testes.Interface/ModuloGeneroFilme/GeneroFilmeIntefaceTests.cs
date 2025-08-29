@@ -57,8 +57,8 @@ public sealed class GeneroFilmeIntefaceTests : TestFixture
         indexPage = formPage
             .PreencherNome(nomeEditado)
             .Confirmar();
-
-        Assert.AreEqual(true, indexPage.ContemGenero(nomeEditado));
+        
+        Assert.IsTrue(indexPage.ContemGenero(nomeEditado));
     }
 
     [TestMethod]
@@ -81,6 +81,6 @@ public sealed class GeneroFilmeIntefaceTests : TestFixture
         indexPage = formPage
             .Confirmar();
         
-        Assert.AreEqual(false, indexPage.ContemGenero(nome));
+        Assert.IsFalse(indexPage.ContemGenero(nome));
     }
 }

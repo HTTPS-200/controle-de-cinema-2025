@@ -40,7 +40,7 @@ public class GeneroFilmeIndexPageObject
 
     public bool ContemGenero(string nome)
     {
-        wait.Until(d => d.FindElement(By.CssSelector("[data-se='contemGenero']")).Displayed);
+        wait.Until(d => d.FindElement(By.CssSelector("a[data-se='btnCadastrar']")).Displayed);
         return driver.PageSource.Contains(nome);
     }
 }
