@@ -57,8 +57,8 @@ public sealed class GeneroFilmeIntefaceTests : TestFixture
         indexPage = formPage
             .PreencherNome(nomeEditado)
             .Confirmar();
-        
-        Assert.IsTrue(indexPage.ContemGenero(nomeEditado));
+
+        Assert.AreEqual(true, indexPage.ContemGenero(nomeEditado));
     }
 
     [TestMethod]
@@ -82,5 +82,27 @@ public sealed class GeneroFilmeIntefaceTests : TestFixture
             .Confirmar();
         
         Assert.IsFalse(indexPage.ContemGenero(nome));
+    }
+
+    [TestMethod]
+    public void Deve_Selecionar_Todos_Os_Generos_Cadastrados()
+    {
+        var nomes = new List<string> { "Ação", "Comédia", "Drama" };
+        var indexPage = new GeneroFilmeIndexPageObject(driver!);
+        
+        foreach (var nome in nomes)
+        {
+            var formPage = indexPage
+                .IrPara(enderecoBase!)
+                .ClickCadastrar();
+            
+            indexPage = formPage
+                .PreencherNome(nome)
+                .Confirmar();
+        }
+        foreach (var nome in nomes)
+        {
+            Assert.IsTrue(indexPage.ContemGenero(nome));
+        }
     }
 }
