@@ -1,46 +1,55 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 
-namespace ControleDeCinema.Testes.Interface.ModuloFilme;
-
-public class FilmeIndexPageObject
+namespace ControleDeCinema.Testes.Interface.ModuloFilme
 {
-    private readonly IWebDriver driver;
-    private readonly WebDriverWait wait;
-
-    public FilmeIndexPageObject(IWebDriver driver)
+    public class FilmeIndexPageObject
     {
-        this.driver = driver;
-        wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-    }
+        private readonly IWebDriver driver;
+        private readonly WebDriverWait wait;
+        private readonly string baseUrl;
 
-    public FilmeIndexPageObject IrPara(string enderecoBase)
-    {
-        driver.Navigate().GoToUrl($"{enderecoBase}/filmes");
-        return this;
-    }
+        public FilmeIndexPageObject(IWebDriver driver, string baseUrl)
+        {
+            this.driver = driver;
+            this.baseUrl = baseUrl;
+            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+        }
 
-    public FilmeFormObjects ClickCadastrar()
-    {
-        wait.Until(d => d.FindElement(By.CssSelector("a[data-se='btnCadastrar']"))).Click();
-        return new FilmeFormObjects(driver);
-    }
+        public FilmeIndexPageObject IrPara(string enderecoBase)
+        {
+            driver.Navigate().GoToUrl($"{enderecoBase.TrimEnd('/')}/filmes");
 
-    public FilmeFormObjects ClickEditar()
-    {
-        wait.Until(d => d.FindElement(By.CssSelector(".card a[title='Edição']"))).Click();
-        return new FilmeFormObjects(driver);
-    }
+            wait.Until(d => d.Url.Contains("/filmes", StringComparison.OrdinalIgnoreCase));
+            wait.Until(d => d.FindElement(By.CssSelector("a[data-se='btnCadastrar']")).Displayed);
 
-    public FilmeFormObjects ClickExcluir()
-    {
-        wait.Until(d => d.FindElement(By.CssSelector(".card a[title='Exclusão']"))).Click();
-        return new FilmeFormObjects(driver);
-    }
+            return this;
+        }
 
-    public bool ContemFilme(string nome)
-    {
-        wait.Until(d => d.FindElement(By.CssSelector("[data-se='contemFilme']")).Displayed);
-        return driver.PageSource.Contains(nome);
+        public FilmeFormPageObject ClickCadastrar()
+        {
+            wait.Until(d => d.FindElement(By.CssSelector("a[data-se='btnCadastrar']"))).Click();
+
+            return new(driver);
+        }
+
+        public FilmeFormPageObject ClickEditar()
+        {
+            wait.Until(d => d.FindElement(By.CssSelector("a[data-se='btnEditar']"))).Click();
+
+            return new(driver);
+        }
+
+        public FilmeFormPageObject ClickExcluir()
+        {
+            wait.Until(d => d.FindElement(By.CssSelector("a[data-se='btnExcluir']"))).Click();
+
+            return new(driver);
+        }
+
+        public bool ContemFilme(string titulo)
+        {
+            return driver.PageSource.Contains(titulo);
+        }
     }
 }
