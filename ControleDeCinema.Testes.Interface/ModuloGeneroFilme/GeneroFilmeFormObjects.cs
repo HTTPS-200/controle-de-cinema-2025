@@ -11,12 +11,12 @@ public class GeneroFilmeFormObjects
     {
         this.driver = driver;
         wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-        wait.Until(d => d.FindElement(By.CssSelector("form[data-se='formPrincipal']")).Displayed);
+        wait.Until(d => d.FindElement(By.CssSelector("form[data-se='form']")).Displayed);
     }
 
     public GeneroFilmeFormObjects PreencherNome(string nome)
     {
-        var campoNome = wait.Until(d => d.FindElement(By.CssSelector("input[data-se='txtNome']")));
+        var campoNome = wait.Until(d => d.FindElement(By.CssSelector("input[data-se='inputDescricao']")));
         campoNome.Clear();
         campoNome.SendKeys(nome);
         return this;
@@ -25,6 +25,9 @@ public class GeneroFilmeFormObjects
     public GeneroFilmeIndexPageObject Confirmar()
     {
         wait.Until(d => d.FindElement(By.CssSelector("button[data-se='btnConfirmar']"))).Click();
-        return new GeneroFilmeIndexPageObject(driver);
+        wait.Until(d => d.Url.Contains("/generos", StringComparison.OrdinalIgnoreCase));
+        wait.Until(d => d.FindElement(By.CssSelector("a[data-se='btnCadastrar']")).Displayed);
+
+        return new(driver);
     }
 }

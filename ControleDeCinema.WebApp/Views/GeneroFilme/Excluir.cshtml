@@ -4,6 +4,7 @@
     ViewBag.Titulo = "Exclusão de Gênero de Filme";
 }
 
+
 <hr />
 <div class="row justify-content-center my-5">
     <div class="col-md-8">
@@ -13,7 +14,7 @@
 
                 <p class="mt-4">Você deseja realmente excluir o registro "@Model.Descricao"?</p>
 
-                <form asp-action="Excluir" data-se="formPrincipal" "asp-route-id="@Model.Id">
+                <form asp-action="Excluir" asp-route-id="@Model.Id" data-se="form">
                     <div class="form-group d-flex align-items-center justify-content-end gap-3">
                         <a asp-action="Index">Voltar para a listagem</a>
                         <button type="submit" class="btn btn-danger px-5" data-se="btnConfirmar">Confirmar</button>
