@@ -30,8 +30,7 @@ public class SessaoIndexPageObject
     public SessaoFormPageObject ClickCadastrar()
     {
         wait.Until(d => d.FindElement(By.CssSelector("a[data-se='btnCadastrar']"))).Click();
-
-        return new(driver);
+        return new SessaoFormPageObject(driver, true); 
     }
 
     public SessaoFormPageObject ClickEditar()
@@ -44,8 +43,7 @@ public class SessaoIndexPageObject
     public SessaoIndexPageObject ClickDetalhes()
     {
         wait.Until(d => d.FindElement(By.CssSelector("a[data-se='btnDetalhes']"))).Click();
-
-        return this;
+        return new SessaoIndexPageObject(driver); 
     }
 
     public SessaoFormPageObject ClickExcluir()

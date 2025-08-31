@@ -12,26 +12,30 @@ namespace ControleDeCinema.Testes.Interface.ModuloSessao
         private readonly IWebDriver driver;
         private readonly WebDriverWait wait;
 
-        public SessaoFormPageObject(IWebDriver driver)
-    {
-        this.driver = driver;
-
-        wait = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
-        wait.IgnoreExceptionTypes(typeof(StaleElementReferenceException), typeof(NoSuchElementException));
-
-        try
+        public SessaoFormPageObject(IWebDriver driver, bool esperarFormulario = true)
         {
-            wait.Until(d =>
-                d.FindElement(By.CssSelector(cssSelectorToFind: "form[data-se='form']")).Displayed);
-        }
-        catch (WebDriverTimeoutException)
-        {
-            DumpOnFailure(driver, "sessao-timeout");
-            throw;
-        }
-    }
+            this.driver = driver;
 
-    public SessaoFormPageObject PreencherInicio(string inicio)
+            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
+            wait.IgnoreExceptionTypes(typeof(StaleElementReferenceException), typeof(NoSuchElementException));
+
+            if (esperarFormulario)
+            {
+                try
+                {
+                    wait.Until(d =>
+                        d.FindElements(By.CssSelector("form[data-se='form']")).Any() ||
+                        d.FindElements(By.TagName("form")).Any());
+                }
+                catch (WebDriverTimeoutException)
+                {
+                    DumpOnFailure(driver, "sessao-timeout");
+                    throw;
+                }
+            }
+        }
+
+        public SessaoFormPageObject PreencherInicio(string inicio)
     {
         wait.Until(d =>
             d.FindElement(By.CssSelector("input[data-se='inputInicio']")).Displayed &&
@@ -107,8 +111,9 @@ namespace ControleDeCinema.Testes.Interface.ModuloSessao
 
         public SessaoFormPageObject ConfirmarComErro()
         {
-            Confirmar();
-            wait.Until(d => d.FindElements(By.CssSelector(".text-danger, .alert-danger")).Any(e => e.Displayed));
+            driver.FindElement(By.CssSelector("button[data-se='btnConfirmar']")).Click();
+            wait.Until(d => d.FindElements(By.CssSelector(".text-danger, .alert-danger"))
+                           .Any(e => e.Displayed));
             return this;
         }
 
@@ -131,6 +136,30 @@ namespace ControleDeCinema.Testes.Interface.ModuloSessao
             catch { /* best-effort */ }
         }
 
+        public SessaoFormPageObject ConfirmarEncerramento()
+        {
+            // Clica no botão "Encerrar"
+            wait.Until(d => d.FindElement(By.CssSelector("button[data-se='btnEncerrar']"))).Click();
+
+            // Aguarda redirecionar para página de detalhes
+            wait.Until(d => d.Url.Contains("/sessoes/detalhes", StringComparison.OrdinalIgnoreCase));
+
+            return this;
+        }
+
+        public SessaoFormPageObject VoltarParaIndex()
+        {
+            wait.Until(d => d.FindElement(By.CssSelector("a[data-se='btnVoltar']"))).Click();
+            wait.Until(d => d.Url.Contains("/sessoes", StringComparison.OrdinalIgnoreCase));
+            return new(driver);
+        }
+
+        public SessaoIndexPageObject ConfirmarExclusao()
+        {
+            wait.Until(d => d.FindElement(By.CssSelector("button[data-se='btnConfirmar']"))).Click();
+            wait.Until(d => d.Url.Contains("/sessoes", StringComparison.OrdinalIgnoreCase));
+            return new SessaoIndexPageObject(driver);
+        }
 
     }
 }

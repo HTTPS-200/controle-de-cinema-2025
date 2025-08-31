@@ -30,7 +30,6 @@ namespace ControleDeCinema.Testes.Interface.ModuloSessao
                 .PreencherDescricao("Comédia")
                 .ConfirmarComSucesso();
 
-            // Arrange - Cadastrar filme
             var filmeIndex = new FilmeIndexPageObject(driver, enderecoBase);
             var filmeForm = filmeIndex.IrPara(enderecoBase)
                                       .ClickCadastrar();
@@ -41,7 +40,6 @@ namespace ControleDeCinema.Testes.Interface.ModuloSessao
                 .SelecionarGenero("Comédia")
                 .ConfirmarComSucesso();
 
-            // Arrange - Cadastrar sala
             var salaIndex = new SalaIndexPageObject(driver);
             salaIndex
                 .IrPara(enderecoBase)
@@ -50,7 +48,6 @@ namespace ControleDeCinema.Testes.Interface.ModuloSessao
                 .PreencherCapacidade("50")
                 .Confirmar();
 
-            // Act - Cadastrar sessão
             var sessaoIndex = new SessaoIndexPageObject(driver);
             var sessaoForm = sessaoIndex
                 .IrPara(enderecoBase)
@@ -63,28 +60,53 @@ namespace ControleDeCinema.Testes.Interface.ModuloSessao
                 .SelecionarSala("5")
                 .ConfirmarComSucesso();
 
-            // Assert
             Assert.IsTrue(sessaoIndex.ContemSessao("Esposa de Mentirinha"));
         }
 
         [TestMethod]
         public void CT002_Deve_Editar_Sessao_Existente()
         {
+
+            var generoIndex = new GeneroFilmeIndexPageObject(driver);
+            generoIndex
+                .IrPara(enderecoBase)
+                .ClickCadastrar()
+                .PreencherDescricao("Ação")
+                .ConfirmarComSucesso();
+
+            var filmeIndex = new FilmeIndexPageObject(driver, enderecoBase);
+            var filmeForm = filmeIndex.IrPara(enderecoBase)
+                                      .ClickCadastrar();
+            filmeForm
+                .PreencherTitulo("Predador")
+                .PreencherDuracao(107)
+                .SelecionarGenero("Ação")
+                .ConfirmarComSucesso();
+
+            var salaIndex = new SalaIndexPageObject(driver);
+            salaIndex
+                .IrPara(enderecoBase)
+                .ClickCadastrar()
+                .PreencherNumero("102")
+                .PreencherCapacidade("50")
+                .Confirmar();
+
             var sessaoIndex = new SessaoIndexPageObject(driver!).IrPara(enderecoBase!);
             var sessaoForm = sessaoIndex.ClickCadastrar();
 
             sessaoForm
-                .PreencherInicio("31/08/2025 18:00")
+                .PreencherInicio("2025-08-31T18:00")
                 .PreencherNumeroMaximoIngressos(40)
-                .SelecionarFilme("Predador")
+                .SelecionarFilme("Predador")  
                 .SelecionarSala("102")
                 .ConfirmarComSucesso();
 
             sessaoForm = sessaoIndex.ClickEditar();
             sessaoForm
-                .PreencherInicio("31/08/2025 19:00")
+                .PreencherInicio("2025-08-31T19:00")
                 .PreencherNumeroMaximoIngressos(45)
                 .ConfirmarComSucesso();
+
 
             Assert.IsTrue(sessaoIndex.ContemSessao("Predador"));
         }
@@ -92,21 +114,50 @@ namespace ControleDeCinema.Testes.Interface.ModuloSessao
         [TestMethod]
         public void CT003_Deve_Excluir_Sessao()
         {
-            var sessaoIndex = new SessaoIndexPageObject(driver!).IrPara(enderecoBase!);
-            var sessaoForm = sessaoIndex.ClickCadastrar();
 
-            sessaoForm
-                .PreencherInicio("31/08/2025 16:00")
-                .PreencherNumeroMaximoIngressos(30)
-                .SelecionarFilme("Predador")
-                .SelecionarSala("103")
+            var generoIndex = new GeneroFilmeIndexPageObject(driver);
+            generoIndex
+                .IrPara(enderecoBase)
+                .ClickCadastrar()
+                .PreencherDescricao("Ação")
                 .ConfirmarComSucesso();
 
-            sessaoForm = sessaoIndex.ClickExcluir();
-            sessaoForm.Confirmar();
+            var filmeIndex = new FilmeIndexPageObject(driver, enderecoBase);
+            filmeIndex.IrPara(enderecoBase)
+                      .ClickCadastrar()
+                      .PreencherTitulo("Predador")
+                      .PreencherDuracao(107)
+                      .SelecionarGenero("Ação")
+                      .ConfirmarComSucesso();
+
+            var salaIndex = new SalaIndexPageObject(driver);
+            salaIndex
+                .IrPara(enderecoBase)
+                .ClickCadastrar()
+                .PreencherNumero("102")
+                .PreencherCapacidade("50")
+                .Confirmar();
+
+            var sessaoIndex = new SessaoIndexPageObject(driver).IrPara(enderecoBase);
+            sessaoIndex.ClickCadastrar()
+                .PreencherInicio("2025-08-31T18:00")
+                .PreencherNumeroMaximoIngressos(40)
+                .SelecionarFilme("Predador")
+                .SelecionarSala("102")
+                .ConfirmarComSucesso();
+
+            sessaoIndex = new SessaoIndexPageObject(driver).IrPara(enderecoBase);
+            var encerramentoForm = sessaoIndex.ClickEncerrar();
+            encerramentoForm.ConfirmarEncerramento()
+                            .VoltarParaIndex();
+
+            sessaoIndex = new SessaoIndexPageObject(driver).IrPara(enderecoBase);
+            var excluirForm = sessaoIndex.ClickExcluir();
+            excluirForm.ConfirmarExclusao();
 
             Assert.IsFalse(sessaoIndex.ContemSessao("Predador"));
         }
+
 
         [TestMethod]
         public void CT004_Deve_Validar_Campos_Obrigatorios()
@@ -116,7 +167,7 @@ namespace ControleDeCinema.Testes.Interface.ModuloSessao
             sessaoForm.ConfirmarComErro();
 
             string erro = sessaoForm.ObterMensagemErro();
-            StringAssert.Contains(erro.ToLower(), "obrigatório");
+            StringAssert.Contains(erro.ToLower(), "ao menos 1");
         }
     }
 }
