@@ -134,59 +134,44 @@ public class AutenticacaoPageObject
     {
         try
         {
-            // Navega para a página inicial onde a navbar com logout está disponível
             driver.Navigate().GoToUrl($"{enderecoBase}");
 
             WebDriverWait wait = new(driver, TimeSpan.FromSeconds(10));
 
-            // Espera a navbar carregar
             wait.Until(d => d.FindElements(By.CssSelector(".navbar")).Count > 0);
 
-            // Procura pelo dropdown de usuário - busca por ícone ou texto genérico
             var dropdownButton = driver.FindElements(By.CssSelector(".dropdown-toggle"))
                 .FirstOrDefault(btn => btn.Text.Contains("person-circle", StringComparison.OrdinalIgnoreCase) ||
                                       btn.FindElements(By.CssSelector(".bi-person-circle")).Count > 0);
 
             if (dropdownButton != null)
             {
-                // Clica no dropdown para abrir o menu
                 dropdownButton.Click();
-
-                // Pequeno delay para o menu abrir
                 Thread.Sleep(500);
 
-                // Procura pelo formulário de logout dentro do dropdown
                 var logoutForm = driver.FindElements(By.CssSelector(".dropdown-menu form[action*='logout']"))
                     .FirstOrDefault();
 
                 if (logoutForm != null)
                 {
-                    // Submete o formulário de logout
                     logoutForm.Submit();
-
-                    // Espera o redirecionamento para a página de login
                     wait.Until(d => d.Url.Contains("/autenticacao/login", StringComparison.OrdinalIgnoreCase) ||
                                    d.FindElements(By.CssSelector("form[data-se='form']")).Count > 0);
                 }
                 else
                 {
-                    // Fallback: navega diretamente para a URL de logout
                     driver.Navigate().GoToUrl($"{enderecoBase}/autenticacao/logout");
                 }
             }
             else
             {
-                // Fallback: navega diretamente para a URL de logout
                 driver.Navigate().GoToUrl($"{enderecoBase}/autenticacao/logout");
             }
-
-            // Espera garantir que o logout foi efetuado
             wait.Until(d => d.FindElements(By.CssSelector("form[action*='/autenticacao/logout']")).Count == 0);
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Erro durante logout: {ex.Message}");
-            // Fallback final: limpa cookies para garantir logout
             driver.Manage().Cookies.DeleteAllCookies();
             driver.Navigate().GoToUrl($"{enderecoBase}/autenticacao/login");
         }
@@ -199,7 +184,6 @@ public class AutenticacaoPageObject
             driver.Navigate().GoToUrl($"{enderecoBase}");
             WebDriverWait wait = new(driver, TimeSpan.FromSeconds(5));
 
-            // Verifica se existe o dropdown de usuário (indicando que está logado)
             return driver.FindElements(By.CssSelector(".dropdown-toggle"))
                 .Any(btn => btn.FindElements(By.CssSelector(".bi-person-circle")).Count > 0 ||
                            (btn.Text.Contains("@") && btn.Text.Contains(".")));
