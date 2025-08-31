@@ -2,45 +2,49 @@
 using OpenQA.Selenium.Support.UI;
 
 namespace ControleDeCinema.Testes.Interface.ModuloGeneroFilme;
+
 public class GeneroFilmeIndexPageObject
 {
     private readonly IWebDriver driver;
     private readonly WebDriverWait wait;
 
-
     public GeneroFilmeIndexPageObject(IWebDriver driver)
     {
         this.driver = driver;
-        wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+
+        wait = new WebDriverWait(driver, TimeSpan.FromSeconds(30));
+        wait.IgnoreExceptionTypes(typeof(StaleElementReferenceException), typeof(NoSuchElementException));
     }
 
     public GeneroFilmeIndexPageObject IrPara(string enderecoBase)
     {
-        driver.Navigate().GoToUrl($"{enderecoBase}/generos");
+        driver.Navigate().GoToUrl($"{enderecoBase.TrimEnd('/')}/generos");
+        wait.Until(d => d.Url.Contains("/generos", StringComparison.OrdinalIgnoreCase));
+        wait.Until(d => d.FindElement(By.CssSelector("a[data-se='btnCadastrar']")).Displayed);
+
         return this;
     }
 
-    public GeneroFilmeFormObjects ClickCadastrar()
+    public GeneroFilmeFormPageObject ClickCadastrar()
     {
         wait.Until(d => d.FindElement(By.CssSelector("a[data-se='btnCadastrar']"))).Click();
-        return new GeneroFilmeFormObjects(driver);
+        return new(driver);
     }
 
-    public GeneroFilmeFormObjects ClickEditar()
+    public GeneroFilmeFormPageObject ClickEditar()
     {
-        wait.Until(d => d.FindElement(By.CssSelector(".card a[title='Edição']"))).Click();
-        return new GeneroFilmeFormObjects(driver);
+        wait.Until(d => d.FindElement(By.CssSelector("a[data-se='btnEditar']"))).Click();
+        return new(driver);
     }
 
-    public GeneroFilmeFormObjects ClickExcluir()
+    public GeneroFilmeFormPageObject ClickExcluir()
     {
-        wait.Until(d => d.FindElement(By.CssSelector(".card a[title='Exclusão']"))).Click();
-        return new GeneroFilmeFormObjects(driver);
+        wait.Until(d => d.FindElement(By.CssSelector("a[data-se='btnExcluir']"))).Click();
+        return new(driver);
     }
 
-    public bool ContemGenero(string nome)
+    public bool ContemGenero(string descricao)
     {
-        wait.Until(d => d.FindElement(By.CssSelector("[data-se='contemGenero']")).Displayed);
-        return driver.PageSource.Contains(nome);
+        return driver.PageSource.Contains(descricao);
     }
 }

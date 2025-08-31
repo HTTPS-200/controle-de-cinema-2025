@@ -1,13 +1,13 @@
 ﻿using ControleDeCinema.Testes.Interface.Compartilhado;
-using OpenQA.Selenium;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ControleDeCinema.Testes.Interface.ModuloGeneroFilme;
 
 [TestClass]
 [TestCategory("Tests de Interface de GeneroFilme")]
-public sealed class GeneroFilmeIntefaceTests : TestFixture
+public sealed class GeneroFilmeInterfaceTests : TestFixture
 {
-    protected AutenticacaoPageObject autenticacaoPage;
+    private AutenticacaoPageObject autenticacaoPage;
 
     [TestInitialize]
     public void InicializarTeste()
@@ -15,94 +15,110 @@ public sealed class GeneroFilmeIntefaceTests : TestFixture
         base.InicializarTeste();
 
         autenticacaoPage = new AutenticacaoPageObject(driver!, enderecoBase!);
-
         autenticacaoPage.RegistrarContaEmpresarial();
     }
 
-
     [TestMethod]
-    public void Deve_Cadastrar_GeneroFilme_Corretamente()
+    public void CT001_Deve_Cadastrar_Genero_Corretamente()
     {
-        var nome = "Ação";
-        var indexPage = new GeneroFilmeIndexPageObject(driver!);
-        var formPage = indexPage
-            .IrPara(enderecoBase!)
-            .ClickCadastrar();
-       
-        indexPage = formPage
-            .PreencherNome(nome)
-            .Confirmar();
-        
-        Assert.IsTrue(indexPage.ContemGenero(nome));
+        var generoIndex = new GeneroFilmeIndexPageObject(driver!).IrPara(enderecoBase!);
+        var generoForm = generoIndex.ClickCadastrar()
+                                    .PreencherDescricao("Ação")
+                                    .Confirmar();
+
+        Assert.IsTrue(generoForm.ContemGenero("Ação"));
     }
 
     [TestMethod]
-    public void Deve_Editar_GeneroFilme_Corretamente()
+    public void CT002_Deve_Editar_Genero_Corretamente()
     {
-        var nome = "Ação";
-        var nomeEditado = "Comédia";
-        var indexPage = new GeneroFilmeIndexPageObject(driver!);
-        
-        var formPage = indexPage
-            .IrPara(enderecoBase!)
-            .ClickCadastrar();
-        
-        indexPage = formPage
-            .PreencherNome(nome)
-            .Confirmar();
-        
-        formPage = indexPage
-            .ClickEditar();
-        
-        indexPage = formPage
-            .PreencherNome(nomeEditado)
-            .Confirmar();
+        var generoIndex = new GeneroFilmeIndexPageObject(driver!).IrPara(enderecoBase!);
 
-        Assert.AreEqual(true, indexPage.ContemGenero(nomeEditado));
+        generoIndex.ClickCadastrar()
+                   .PreencherDescricao("Romance")
+                   .Confirmar();
+
+        var formEditar = generoIndex.IrPara(enderecoBase!).ClickEditar();
+        formEditar.PreencherDescricao("Comédia").Confirmar();
+
+        Assert.IsTrue(generoIndex.ContemGenero("Comédia"));
     }
 
     [TestMethod]
-    public void Deve_Excluir_GeneroFilme_Corretamente()
+    public void CT003_Deve_Excluir_Genero_Corretamente()
     {
-        var nome = "Ação";
-        var indexPage = new GeneroFilmeIndexPageObject(driver!);
-        
-        var formPage = indexPage
-            .IrPara(enderecoBase!)
-            .ClickCadastrar();
-        
-        indexPage = formPage
-            .PreencherNome(nome)
+        var generoIndex = new GeneroFilmeIndexPageObject(driver!).IrPara(enderecoBase!);
+
+        generoIndex
+            .ClickCadastrar()
+            .PreencherDescricao("Românce")
             .Confirmar();
-        
-        formPage = indexPage
+
+        var generoForm = generoIndex
+            .IrPara(enderecoBase!)
             .ClickExcluir();
-        
-        indexPage = formPage
-            .Confirmar();
-        
-        Assert.IsFalse(indexPage.ContemGenero(nome));
+
+        generoForm.ClickConfirmarExcluir("Românce");
+
+        Assert.IsFalse(generoIndex.ContemGenero("Românce"));
     }
 
     [TestMethod]
-    public void Deve_Selecionar_Todos_Os_Generos_Cadastrados()
+    public void CT004_Deve_Listar_Todos_Os_Generos()
     {
-        var nomes = new List<string> { "Ação", "Comédia", "Drama" };
-        var indexPage = new GeneroFilmeIndexPageObject(driver!);
-        
-        foreach (var nome in nomes)
+        var generos = new[] { "Aventura", "Drama", "Suspense" };
+        var generoIndex = new GeneroFilmeIndexPageObject(driver!);
+
+        foreach (var g in generos)
         {
-            var formPage = indexPage
-                .IrPara(enderecoBase!)
-                .ClickCadastrar();
-            
-            indexPage = formPage
-                .PreencherNome(nome)
-                .Confirmar();
+            generoIndex.IrPara(enderecoBase!)
+                       .ClickCadastrar()
+                       .PreencherDescricao(g)
+                       .Confirmar();
         }
-        foreach (var nome in nomes)
-        {
-            Assert.IsTrue(indexPage.ContemGenero(nome));
-        }
+
+        generoIndex.IrPara(enderecoBase!);
+
+        foreach (var g in generos)
+            Assert.IsTrue(generoIndex.ContemGenero(g));
     }
+
+    [TestMethod]
+    public void CT005_Deve_Validar_Campo_Obrigatorio()
+    {
+        var generoIndex = new GeneroFilmeIndexPageObject(driver!).IrPara(enderecoBase!);
+
+        var generoForm = generoIndex
+            .ClickCadastrar()
+            .PreencherDescricao("")
+            .ConfirmarComErro();
+
+        Assert.AreEqual("O campo \"Descrição\" é obrigatório.", generoForm.ObterMensagemErro());
+
+        // StringAssert.Contains(generoForm.ObterMensagemErro(), "Descrição");
+        // StringAssert.Contains(generoForm.ObterMensagemErro(), "obrigatório");
+    }
+
+    [TestMethod]
+    public void CT006_Deve_Validar_Genero_Duplicado()
+    {
+        var generoIndex = new GeneroFilmeIndexPageObject(driver!).IrPara(enderecoBase!);
+
+        generoIndex
+            .ClickCadastrar()
+            .PreencherDescricao("Aventura")
+            .ConfirmarComSucesso();
+
+        var generoForm = generoIndex
+            .IrPara(enderecoBase!)
+            .ClickCadastrar()
+            .PreencherDescricao("Aventura")
+            .ConfirmarComErro();
+
+        StringAssert.Contains(
+            generoForm.ObterMensagemErro().ToLower(),
+            "já existe"
+        );
+    }
+
 }
