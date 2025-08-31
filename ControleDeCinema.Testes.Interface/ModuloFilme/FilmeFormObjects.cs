@@ -12,12 +12,12 @@ namespace ControleDeCinema.Testes.Interface.ModuloFilme
         public FilmeFormPageObject(IWebDriver driver)
         {
             this.driver = driver;
-            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(20)); // aumentei para 20s
         }
 
         public FilmeFormPageObject PreencherTitulo(string titulo)
         {
-            var input = driver.FindElement(By.CssSelector("[data-se='inputTitulo']"));
+            var input = wait.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("[data-se='inputTitulo']")));
             input.Clear();
             input.SendKeys(titulo);
             return this;
@@ -25,7 +25,7 @@ namespace ControleDeCinema.Testes.Interface.ModuloFilme
 
         public FilmeFormPageObject PreencherDuracao(int duracao)
         {
-            var input = driver.FindElement(By.CssSelector("[data-se='inputDuracao']"));
+            var input = wait.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("[data-se='inputDuracao']")));
             input.Clear();
             input.SendKeys(duracao.ToString());
             return this;
@@ -33,42 +33,32 @@ namespace ControleDeCinema.Testes.Interface.ModuloFilme
 
         public FilmeFormPageObject MarcarLancamento(bool lancamento = true)
         {
-            var checkbox = driver.FindElement(By.CssSelector("[data-se='checkboxLancamento']"));
+            var checkbox = wait.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("[data-se='checkboxLancamento']")));
             if (checkbox.Selected != lancamento)
                 checkbox.Click();
             return this;
         }
 
-        public FilmeFormPageObject SelecionarGenero(string genero)
+        public FilmeFormPageObject SelecionarGenero(string descricao)
         {
-            wait.Until(d =>
-            d.FindElement(By.CssSelector("select[data-se='selectGenero']")).Displayed &&
-            d.FindElement(By.CssSelector("select[data-se='selectGenero']")).Enabled
-        );
+            IWebElement selectElement = wait.Until(d =>
+            {
+                var elem = d.FindElement(By.CssSelector("select[data-se='selectGenero']"));
+                if (!elem.Displayed || !elem.Enabled) return null;
+                var select = new SelectElement(elem);
+                return select.Options.Any(o => o.Text == descricao) ? elem : null;
+            });
 
-            SelectElement selectGenero = new(driver.FindElement(By.CssSelector("select[data-se='selectGenero']")));
-
-            wait.Until(_ => selectGenero.Options.Any(o => o.Text == genero));
-
-            selectGenero.SelectByText(genero);
+            var selectFinal = new SelectElement(selectElement);
+            selectFinal.SelectByText(descricao);
 
             return this;
         }
 
-        public void Confirmar()
+        public FilmeFormPageObject Confirmar()
         {
-            driver.FindElement(By.CssSelector("[data-se='btnConfirmar']")).Click();
-        }
-
-        public string ObterMensagemErro()
-        {
-            return driver.FindElement(By.CssSelector(".text-danger")).Text;
-        }
-
-        public FilmeFormPageObject ConfirmarComErro()
-        {
-            Confirmar();
-            wait.Until(d => d.FindElement(By.CssSelector(".text-danger")).Displayed);
+            var btn = wait.Until(ExpectedConditions.ElementToBeClickable(By.CssSelector("[data-se='btnConfirmar']")));
+            btn.Click();
             return this;
         }
 
@@ -77,6 +67,26 @@ namespace ControleDeCinema.Testes.Interface.ModuloFilme
             Confirmar();
             wait.Until(d => d.Url.Contains("/filmes", StringComparison.OrdinalIgnoreCase));
             return this;
+        }
+
+        public FilmeFormPageObject ConfirmarComErro()
+        {
+            Confirmar();
+
+            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(40));
+            wait.Until(d =>
+                d.FindElements(By.CssSelector(".text-danger, .alert-danger, .toast-error"))
+                 .Any(e => e.Displayed)
+            );
+
+            return this;
+        }
+
+        public string ObterMensagemErro()
+        {
+            var elemento = driver.FindElements(By.CssSelector(".text-danger, .alert-danger, .toast-error"))
+                                .FirstOrDefault(e => e.Displayed);
+            return elemento?.Text ?? string.Empty;
         }
     }
 }

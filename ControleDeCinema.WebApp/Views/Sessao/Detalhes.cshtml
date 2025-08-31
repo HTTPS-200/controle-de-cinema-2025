@@ -24,12 +24,12 @@
 
                 <div class="form-group d-grid gap-2 mt-3">
                     <label for="Filme" class="control-label fs-5">Filme:</label>
-                    <input name="Filme" class="form-control" value="@Model.Filme" readonly disabled />
+                    <input name="Filme" class="form-control" value="@Model.Filme" readonly disabled data-se="ingressosVendidos" />
                 </div>
 
                 <div class="form-group d-grid gap-2 mt-3">
                     <label for="Sala" class="control-label fs-5">Sala:</label>
-                    <input name="Sala" class="form-control" value="@Model.Sala" readonly disabled />
+                    <input name="Sala" class="form-control" value="@Model.Sala" readonly disabled data-se="ingressosDisponiveis" />
                 </div>
 
                 <div class="form-group d-grid gap-2 mt-3">
@@ -38,7 +38,7 @@
                 </div>
 
                 <div class="form-group d-flex align-items-center justify-content-end gap-3 mt-5">
-                    <a asp-action="Index">Voltar para a listagem</a>
+                    <a asp-action="Index" data-se="btnVoltar">Voltar para a listagem</a>
                 </div>
             </div>
         </div>

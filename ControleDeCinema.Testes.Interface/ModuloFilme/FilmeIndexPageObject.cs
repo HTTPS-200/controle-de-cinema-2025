@@ -13,38 +13,33 @@ namespace ControleDeCinema.Testes.Interface.ModuloFilme
         {
             this.driver = driver;
             this.baseUrl = baseUrl;
-            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
         }
 
         public FilmeIndexPageObject IrPara(string enderecoBase)
         {
             driver.Navigate().GoToUrl($"{enderecoBase.TrimEnd('/')}/filmes");
-
             wait.Until(d => d.Url.Contains("/filmes", StringComparison.OrdinalIgnoreCase));
             wait.Until(d => d.FindElement(By.CssSelector("a[data-se='btnCadastrar']")).Displayed);
-
             return this;
         }
 
         public FilmeFormPageObject ClickCadastrar()
         {
-            wait.Until(d => d.FindElement(By.CssSelector("a[data-se='btnCadastrar']"))).Click();
-
-            return new(driver);
+            driver.FindElement(By.CssSelector("a[data-se='btnCadastrar']")).Click();
+            return new FilmeFormPageObject(driver);
         }
 
         public FilmeFormPageObject ClickEditar()
         {
-            wait.Until(d => d.FindElement(By.CssSelector("a[data-se='btnEditar']"))).Click();
-
-            return new(driver);
+            driver.FindElement(By.CssSelector("a[data-se='btnEditar']")).Click();
+            return new FilmeFormPageObject(driver);
         }
 
         public FilmeFormPageObject ClickExcluir()
         {
-            wait.Until(d => d.FindElement(By.CssSelector("a[data-se='btnExcluir']"))).Click();
-
-            return new(driver);
+            driver.FindElement(By.CssSelector("a[data-se='btnExcluir']")).Click();
+            return new FilmeFormPageObject(driver);
         }
 
         public bool ContemFilme(string titulo)

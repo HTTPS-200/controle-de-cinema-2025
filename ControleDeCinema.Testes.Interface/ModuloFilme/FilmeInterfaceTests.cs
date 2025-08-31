@@ -1,4 +1,5 @@
 ﻿using ControleDeCinema.Testes.Interface.Compartilhado;
+using ControleDeCinema.Testes.Interface.ModuloGeneroFilme;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ControleDeCinema.Testes.Interface.ModuloFilme
@@ -13,7 +14,6 @@ namespace ControleDeCinema.Testes.Interface.ModuloFilme
         public void InicializarTeste()
         {
             base.InicializarTeste();
-
             autenticacaoPage = new AutenticacaoPageObject(driver!, enderecoBase!);
             autenticacaoPage.RegistrarContaEmpresarial();
         }
@@ -21,87 +21,122 @@ namespace ControleDeCinema.Testes.Interface.ModuloFilme
         [TestMethod]
         public void CT001_Deve_Cadastrar_Filme_Corretamente()
         {
-            var filmeIndex = new FilmeIndexPageObject(driver!, enderecoBase!).IrPara(enderecoBase!);
+            GeneroFilmeIndexPageObject generoFilmeIndex = new(driver);
+            generoFilmeIndex
+                .IrPara(enderecoBase)
+                .ClickCadastrar()
+                .PreencherDescricao("Terror")
+                .ConfirmarComSucesso();
 
-            var filmeForm = filmeIndex.ClickCadastrar()
-                                      .PreencherTitulo("Titanic")
-                                      .PreencherDuracao(195)
-                                      .SelecionarGenero("Romance")
-                                      .MarcarLancamento(false);
+            FilmeIndexPageObject filmeIndex = new(driver, enderecoBase);
 
-            filmeForm.Confirmar();
+            FilmeFormPageObject filmeForm = filmeIndex
+                .IrPara(enderecoBase)
+                .ClickCadastrar();
 
-            filmeIndex.IrPara(enderecoBase!);
+            filmeForm
+                .PreencherTitulo("Alien o 8 Passageiro")
+                .PreencherDuracao(117)
+                .MarcarLancamento()
+                .SelecionarGenero("Terror")
+                .ConfirmarComSucesso();
 
-            Assert.IsTrue(filmeIndex.ContemFilme("Titanic"));
+            Assert.IsTrue(filmeIndex.ContemFilme("Alien o 8 Passageiro"));
         }
+
 
         [TestMethod]
         public void CT002_Deve_Editar_Filme_Corretamente()
         {
-            var filmeIndex = new FilmeIndexPageObject(driver!, enderecoBase!);
+            GeneroFilmeIndexPageObject generoFilmeIndex = new(driver);
+            generoFilmeIndex
+                .IrPara(enderecoBase)
+                .ClickCadastrar()
+                .PreencherDescricao("Terror")
+                .ConfirmarComSucesso();
 
-            // Pré-condição: cadastrar filme
-            filmeIndex.IrPara(enderecoBase!)
-                      .ClickCadastrar()
-                      .PreencherTitulo("Avatar")
-                      .PreencherDuracao(160)
-                      .SelecionarGenero("Ação")
-                      .MarcarLancamento(true)
-                      .Confirmar();
 
-            var filmeForm = filmeIndex.IrPara(enderecoBase!)
-                                      .ClickEditar();
+            FilmeIndexPageObject filmeIndex = new(driver, enderecoBase);
+            FilmeFormPageObject filmeForm = filmeIndex
+                .IrPara(enderecoBase)
+                .ClickCadastrar();
 
-            filmeForm.PreencherTitulo("Avatar 2")
-                     .PreencherDuracao(170)
-                     .Confirmar();
+            filmeForm
+                .PreencherTitulo("Alien o 8 Passageiro")
+                .PreencherDuracao(117)
+                .MarcarLancamento()
+                .SelecionarGenero("Terror")
+                .ConfirmarComSucesso();
 
-            filmeIndex.IrPara(enderecoBase!);
+            filmeForm = filmeIndex
+                .IrPara(enderecoBase)
+                .ClickEditar();
 
-            Assert.IsTrue(filmeIndex.ContemFilme("Avatar 2"));
+            filmeForm
+                .PreencherTitulo("Alien o 8 Passageiro Editada")
+                .PreencherDuracao(117)
+                .MarcarLancamento()
+                .SelecionarGenero("Terror")
+                .ConfirmarComSucesso();
+
+            Assert.IsTrue(filmeIndex.ContemFilme("Alien o 8 Passageiro Editada"));
         }
+
 
         [TestMethod]
         public void CT003_Deve_Excluir_Filme_Corretamente()
         {
-            var filmeIndex = new FilmeIndexPageObject(driver!, enderecoBase!);
+            var generoIndex = new GeneroFilmeIndexPageObject(driver);
+            generoIndex.IrPara(enderecoBase)
+                       .ClickCadastrar()
+                       .PreencherDescricao("Terror")
+                       .ConfirmarComSucesso();
 
-            // Pré-condição: cadastrar filme
-            filmeIndex.IrPara(enderecoBase!)
-                      .ClickCadastrar()
-                      .PreencherTitulo("Matrix")
-                      .PreencherDuracao(136)
-                      .SelecionarGenero("Ação")
-                      .MarcarLancamento(false)
-                      .Confirmar();
+            var filmeIndex = new FilmeIndexPageObject(driver, enderecoBase);
+            var filmeForm = filmeIndex.IrPara(enderecoBase)
+                                      .ClickCadastrar();
 
-            var filmeForm = filmeIndex.IrPara(enderecoBase!)
-                                      .ClickExcluir();
+            filmeForm.PreencherTitulo("Alien o 8 Passageiro")
+                     .PreencherDuracao(117)
+                     .MarcarLancamento()
+                     .SelecionarGenero("Terror")
+                     .ConfirmarComSucesso();
 
-            filmeForm.Confirmar();
+            filmeForm = filmeIndex.IrPara(enderecoBase)
+                                  .ClickExcluir();
 
-            Assert.IsFalse(filmeIndex.ContemFilme("Matrix"));
+            filmeForm.ConfirmarComSucesso();
+
+            Assert.IsFalse(filmeIndex.ContemFilme("Alien o 8 Passageiro"));
         }
 
         [TestMethod]
         public void CT004_Deve_Listar_Todos_Os_Filmes()
         {
-            var filmes = new[] { "Interestelar", "Gladiador", "Inception" };
-            var filmeIndex = new FilmeIndexPageObject(driver!, enderecoBase!);
+            var generoIndex = new GeneroFilmeIndexPageObject(driver);
+            generoIndex.IrPara(enderecoBase)
+                       .ClickCadastrar()
+                       .PreencherDescricao("Terror")
+                       .ConfirmarComSucesso();
 
-            foreach (var f in filmes)
+            var filmeIndex = new FilmeIndexPageObject(driver, enderecoBase);
+
+            string[] filmes = { "Alien o 8 Passageiro", "Predador" };
+            int[] duracoes = { 117, 91 };
+
+            for (int i = 0; i < filmes.Length; i++)
             {
-                filmeIndex.IrPara(enderecoBase!)
-                          .ClickCadastrar()
-                          .PreencherTitulo(f)
-                          .PreencherDuracao(120)
-                          .SelecionarGenero("Ação")
-                          .MarcarLancamento(false)
-                          .Confirmar();
+                var form = filmeIndex.IrPara(enderecoBase)
+                                     .ClickCadastrar();
+
+                form.PreencherTitulo(filmes[i])
+                    .PreencherDuracao(duracoes[i])
+                    .MarcarLancamento()
+                    .SelecionarGenero("Terror")
+                    .ConfirmarComSucesso();
             }
 
-            filmeIndex.IrPara(enderecoBase!);
+            filmeIndex.IrPara(enderecoBase);
 
             foreach (var f in filmes)
                 Assert.IsTrue(filmeIndex.ContemFilme(f));
@@ -110,51 +145,76 @@ namespace ControleDeCinema.Testes.Interface.ModuloFilme
         [TestMethod]
         public void CT005_Deve_Validar_Campos_Obrigatorios()
         {
-            var filmeIndex = new FilmeIndexPageObject(driver!, enderecoBase!).IrPara(enderecoBase!);
+            var generoIndex = new GeneroFilmeIndexPageObject(driver);
+            generoIndex.IrPara(enderecoBase)
+                       .ClickCadastrar()
+                       .PreencherDescricao("Terror")
+                       .ConfirmarComSucesso();
 
-            var filmeForm = filmeIndex.ClickCadastrar()
-                                      .PreencherTitulo("")
-                                      .PreencherDuracao(0)
-                                      .SelecionarGenero("")
-                                      .ConfirmarComErro();
+            var filmeIndex = new FilmeIndexPageObject(driver, enderecoBase);
+            var filmeForm = filmeIndex.IrPara(enderecoBase)
+                                      .ClickCadastrar();
 
-            StringAssert.Contains(filmeForm.ObterMensagemErro(), "obrigatório");
+            filmeForm.ConfirmarComErro();
+
+            string erro = filmeForm.ObterMensagemErro();
+            StringAssert.Contains(erro, "obrigatório");
         }
 
         [TestMethod]
         public void CT006_Deve_Validar_Duracao_Positiva()
         {
-            var filmeIndex = new FilmeIndexPageObject(driver!, enderecoBase!).IrPara(enderecoBase!);
+            var generoIndex = new GeneroFilmeIndexPageObject(driver);
+            generoIndex.IrPara(enderecoBase)
+                       .ClickCadastrar()
+                       .PreencherDescricao("Terror")
+                       .ConfirmarComSucesso();
 
-            var filmeForm = filmeIndex.ClickCadastrar()
-                                      .PreencherTitulo("Filme Negativo")
-                                      .PreencherDuracao(-50)
-                                      .SelecionarGenero("Drama")
-                                      .ConfirmarComErro();
+            var filmeIndex = new FilmeIndexPageObject(driver, enderecoBase);
+            var filmeForm = filmeIndex.IrPara(enderecoBase)
+                                      .ClickCadastrar();
 
-            StringAssert.Contains(filmeForm.ObterMensagemErro().ToLower(), "positiva");
+            filmeForm.PreencherTitulo("Alien o 8 Passageiro")
+                     .PreencherDuracao(0) 
+                     .MarcarLancamento()
+                     .SelecionarGenero("Terror")
+                     .ConfirmarComErro();
+
+            string erro = filmeForm.ObterMensagemErro();
+
+            StringAssert.Contains(erro.ToLower(), "acima de 0");
         }
 
         [TestMethod]
         public void CT007_Deve_Validar_Titulo_Duplicado()
         {
-            var filmeIndex = new FilmeIndexPageObject(driver!, enderecoBase!);
+            var generoIndex = new GeneroFilmeIndexPageObject(driver);
+            generoIndex.IrPara(enderecoBase)
+                       .ClickCadastrar()
+                       .PreencherDescricao("Ação")
+                       .ConfirmarComSucesso();
 
-            filmeIndex.IrPara(enderecoBase!)
+            var filmeIndex = new FilmeIndexPageObject(driver, enderecoBase);
+
+            filmeIndex.IrPara(enderecoBase)
                       .ClickCadastrar()
-                      .PreencherTitulo("Duplicado")
+                      .PreencherTitulo("Matrix")
                       .PreencherDuracao(120)
-                      .SelecionarGenero("Comédia")
+                      .MarcarLancamento()
+                      .SelecionarGenero("Ação")
                       .ConfirmarComSucesso();
 
-            var filmeForm = filmeIndex.IrPara(enderecoBase!)
-                                      .ClickCadastrar()
-                                      .PreencherTitulo("Duplicado")
-                                      .PreencherDuracao(130)
-                                      .SelecionarGenero("Comédia")
-                                      .ConfirmarComErro();
+            var filmeForm = filmeIndex.ClickCadastrar();
+            filmeForm.PreencherTitulo("Matrix")
+                     .PreencherDuracao(130)
+                     .MarcarLancamento()
+                     .SelecionarGenero("Ação")
+                     .ConfirmarComErro();
 
-            StringAssert.Contains(filmeForm.ObterMensagemErro().ToLower(), "já está em uso");
+            string erro = filmeForm.ObterMensagemErro();
+
+            StringAssert.Contains(erro.ToLower(), "já existe um filme");
         }
+
     }
 }
