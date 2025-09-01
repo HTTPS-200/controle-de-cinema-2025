@@ -54,13 +54,22 @@ jobs:
         env:
           ASPNET_ENVIRONMENT: "GITHUB_ACTIONS"
           SQL_CONNECTION_STRING: ${{ secrets.SQL_CONNECTION_STRING }}
-  
 
   migrate:
     runs-on: windows-latest
     needs: [build, test]
     permissions:
       contents: read
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: MinhaSenhaFraca
+          POSTGRES_DB: controle-de-cinema-db
+        ports:
+          - 5432:5432
 
     steps:
       - name: Checkout repository
