@@ -216,21 +216,4 @@ public class AutenticacaoPageObject
         btnConfirmar.Click();
     }
 }
-    //private void ConfirmarFormulario()
-    //{
-    //    wait.Until(d =>
-    //    {
-    //        var btn = d.FindElement(By.CssSelector("button[data-se='btnConfirmar']"));
-    //        if (!btn.Enabled || !btn.Displayed) return false;
-    //        btn.Click();
-    //        return true;
-    //    });
-
-//    wait.Until(d =>
-//        !d.Url.Contains("/autenticacao/registro", StringComparison.OrdinalIgnoreCase) &&
-//        !d.Url.Contains("/autenticacao/login", StringComparison.OrdinalIgnoreCase)
-//    );
-
-//    wait.Until(d => d.FindElements(By.CssSelector("form[action='/autenticacao/logout']")).Count > 0);
-//}
 
