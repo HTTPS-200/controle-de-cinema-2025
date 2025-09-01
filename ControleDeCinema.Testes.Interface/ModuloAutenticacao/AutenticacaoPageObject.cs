@@ -58,6 +58,7 @@ public class AutenticacaoPageObject
 
         wait.Until(d => d.FindElements(By.CssSelector("form[action='/autenticacao/logout']")).Count > 0);
     }
+
     public void RegistrarContaCliente()
     {
         driver.Navigate().GoToUrl($"{enderecoBase}/autenticacao/registro");
@@ -100,6 +101,8 @@ public class AutenticacaoPageObject
     {
         driver.Navigate().GoToUrl($"{enderecoBase}/autenticacao/login");
 
+        WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+
         IWebElement inputEmail = driver.FindElement(By.CssSelector("input[data-se='inputEmail']"));
         IWebElement inputSenha = driver.FindElement(By.CssSelector("input[data-se='inputSenha']"));
 
@@ -113,7 +116,7 @@ public class AutenticacaoPageObject
         inputSenha.Clear();
         inputSenha.SendKeys(senhaPadrao);
 
-        WebDriverWait wait = new(driver, TimeSpan.FromSeconds(20));
+        wait = new(driver, TimeSpan.FromSeconds(20));
 
         wait.Until(d =>
         {
