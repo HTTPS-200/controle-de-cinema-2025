@@ -179,7 +179,7 @@ public class AutenticacaoPageObject
         }
     }
 
-        public bool EstaLogado()
+    public bool EstaLogado()
     {
         try
         {
@@ -194,6 +194,27 @@ public class AutenticacaoPageObject
             return false;
         }
     }
+
+    public void FazerLoginComCredenciais(string email, string senha)
+    {
+        driver.Navigate().GoToUrl($"{enderecoBase}/autenticacao/login");
+
+        WebDriverWait wait = new(driver, TimeSpan.FromSeconds(10));
+        wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(
+            By.CssSelector("form[action='/autenticacao/login']")));
+
+        var inputEmail = driver.FindElement(By.CssSelector("input[data-se='inputEmail']"));
+        var inputSenha = driver.FindElement(By.CssSelector("input[data-se='inputSenha']"));
+
+        inputEmail.Clear();
+        inputEmail.SendKeys(email);
+
+        inputSenha.Clear();
+        inputSenha.SendKeys(senha);
+
+        var btnConfirmar = driver.FindElement(By.CssSelector("button[data-se='btnConfirmar']"));
+        btnConfirmar.Click();
+    }
 }
     //private void ConfirmarFormulario()
     //{
@@ -205,11 +226,11 @@ public class AutenticacaoPageObject
     //        return true;
     //    });
 
-    //    wait.Until(d =>
-    //        !d.Url.Contains("/autenticacao/registro", StringComparison.OrdinalIgnoreCase) &&
-    //        !d.Url.Contains("/autenticacao/login", StringComparison.OrdinalIgnoreCase)
-    //    );
+//    wait.Until(d =>
+//        !d.Url.Contains("/autenticacao/registro", StringComparison.OrdinalIgnoreCase) &&
+//        !d.Url.Contains("/autenticacao/login", StringComparison.OrdinalIgnoreCase)
+//    );
 
-    //    wait.Until(d => d.FindElements(By.CssSelector("form[action='/autenticacao/logout']")).Count > 0);
-    //}
+//    wait.Until(d => d.FindElements(By.CssSelector("form[action='/autenticacao/logout']")).Count > 0);
+//}
 
