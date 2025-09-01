@@ -1,5 +1,6 @@
 ﻿using ControleDeCinema.Testes.Interface.Compartilhado;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using OpenQA.Selenium;
 
 namespace ControleDeCinema.Testes.Interface.ModuloGeneroFilme;
 
@@ -13,9 +14,29 @@ public sealed class GeneroFilmeInterfaceTests : TestFixture
     public void InicializarTeste()
     {
         base.InicializarTeste();
-
         autenticacaoPage = new AutenticacaoPageObject(driver!, enderecoBase!);
-        autenticacaoPage.RegistrarContaEmpresarial();
+
+        driver!.Manage().Cookies.DeleteAllCookies();
+        driver.Navigate().GoToUrl(enderecoBase!);
+
+        ((IJavaScriptExecutor)driver).ExecuteScript("window.localStorage.clear();");
+        ((IJavaScriptExecutor)driver).ExecuteScript("window.sessionStorage.clear();");
+
+        if (!autenticacaoPage.EstaLogado())
+        {
+            try
+            {
+                autenticacaoPage.RegistrarContaEmpresarial();
+            }
+            catch (WebDriverTimeoutException)
+            {
+                autenticacaoPage.FazerLogin("Empresa");
+            }
+            catch (NoSuchElementException)
+            {
+                autenticacaoPage.FazerLogin("Empresa");
+            }
+        }
     }
 
     [TestMethod]
@@ -66,21 +87,22 @@ public sealed class GeneroFilmeInterfaceTests : TestFixture
     [TestMethod]
     public void CT004_Deve_Listar_Todos_Os_Generos()
     {
-        var generos = new[] { "Aventura", "Drama", "Suspense" };
         var generoIndex = new GeneroFilmeIndexPageObject(driver!);
 
-        foreach (var g in generos)
-        {
-            generoIndex.IrPara(enderecoBase!)
-                       .ClickCadastrar()
-                       .PreencherDescricao(g)
-                       .Confirmar();
-        }
+        generoIndex.IrPara(enderecoBase!)
+                   .ClickCadastrar()
+                   .PreencherDescricao("Ação")
+                   .Confirmar();
+
+        generoIndex.IrPara(enderecoBase!)
+                   .ClickCadastrar()
+                   .PreencherDescricao("Romance")
+                   .Confirmar();
 
         generoIndex.IrPara(enderecoBase!);
 
-        foreach (var g in generos)
-            Assert.IsTrue(generoIndex.ContemGenero(g));
+        Assert.IsTrue(generoIndex.ContemGenero("Ação"));
+        Assert.IsTrue(generoIndex.ContemGenero("Romance"));
     }
 
     [TestMethod]

@@ -17,6 +17,7 @@ public sealed class SalaInterfaceTests : TestFixture
         base.InicializarTeste();
 
         autenticacaoPage = new AutenticacaoPageObject(driver!, enderecoBase!);
+        driver!.Manage().Cookies.DeleteAllCookies();
         autenticacaoPage.RegistrarContaEmpresarial();
         //autenticacaoPage.FazerLogin("Empresa");
     }

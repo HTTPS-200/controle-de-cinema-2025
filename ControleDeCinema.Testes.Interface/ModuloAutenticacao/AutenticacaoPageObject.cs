@@ -24,6 +24,8 @@ public class AutenticacaoPageObject
     {
         driver.Navigate().GoToUrl($"{enderecoBase}/autenticacao/registro");
 
+
+        var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
         IWebElement inputEmail = driver.FindElement(By.CssSelector("input[data-se='inputEmail']"));
         IWebElement inputSenha = driver.FindElement(By.CssSelector("input[data-se='inputSenha']"));
         IWebElement inputConfirmarSenha = driver.FindElement(By.CssSelector("input[data-se='inputConfirmarSenha']"));
@@ -40,7 +42,7 @@ public class AutenticacaoPageObject
 
         selectTipoUsuario.SelectByText("Empresa");
 
-        WebDriverWait wait = new(driver, TimeSpan.FromSeconds(20));
+        //WebDriverWait wait = new(driver, TimeSpan.FromSeconds(20));
 
         wait.Until(d =>
         {

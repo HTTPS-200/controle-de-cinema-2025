@@ -2,6 +2,7 @@
 using ControleDeCinema.Testes.Interface.ModuloFilme;
 using ControleDeCinema.Testes.Interface.ModuloGeneroFilme;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using OpenQA.Selenium;
 using TesteFacil.Testes.Interface.ModuloSala;
 
 namespace ControleDeCinema.Testes.Interface.ModuloSessao
@@ -17,7 +18,28 @@ namespace ControleDeCinema.Testes.Interface.ModuloSessao
         {
             base.InicializarTeste();
             autenticacaoPage = new AutenticacaoPageObject(driver!, enderecoBase!);
-            autenticacaoPage.RegistrarContaEmpresarial();
+
+            driver!.Manage().Cookies.DeleteAllCookies();
+            driver.Navigate().GoToUrl(enderecoBase!);
+
+            ((IJavaScriptExecutor)driver).ExecuteScript("window.localStorage.clear();");
+            ((IJavaScriptExecutor)driver).ExecuteScript("window.sessionStorage.clear();");
+
+            if (!autenticacaoPage.EstaLogado())
+            {
+                try
+                {
+                    autenticacaoPage.RegistrarContaEmpresarial();
+                }
+                catch (WebDriverTimeoutException)
+                {
+                    autenticacaoPage.FazerLogin("Empresa");
+                }
+                catch (NoSuchElementException)
+                {
+                    autenticacaoPage.FazerLogin("Empresa");
+                }
+            }
         }
 
         [TestMethod]

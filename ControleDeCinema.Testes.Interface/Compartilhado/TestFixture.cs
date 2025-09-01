@@ -113,6 +113,12 @@ public abstract class TestFixture
         dbContext.Filmes.RemoveRange(dbContext.Filmes);
         dbContext.Salas.RemoveRange(dbContext.Salas);
         dbContext.Sessoes.RemoveRange(dbContext.Sessoes);
+        dbContext.Ingressos.RemoveRange(dbContext.Ingressos);
+
+
+        dbContext.UserRoles.RemoveRange(dbContext.UserRoles);
+        dbContext.Users.RemoveRange(dbContext.Users);
+        dbContext.Roles.RemoveRange(dbContext.Roles);
 
         dbContext.SaveChanges();
     }
@@ -192,6 +198,14 @@ public abstract class TestFixture
         var enderecoSelenium = new Uri($"http://{seleniumContainer.Hostname}:{seleniumContainer.GetMappedPublicPort(seleniumPort)}/wd/hub");
 
         var options = new ChromeOptions();
+        options.AddArguments(
+    "--headless=new", // ou "--headless"
+    "--no-sandbox",
+    "--disable-dev-shm-usage",
+    "--disable-gpu",
+    "--disable-extensions",
+    "--window-size=1920,1080"
+);
 
         driver = new RemoteWebDriver(enderecoSelenium, options);
     }

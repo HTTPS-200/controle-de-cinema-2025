@@ -11,6 +11,14 @@ public sealed class AutenticacaoInterfaceTests : TestFixture
 {
     private AutenticacaoPageObject autenticacaoPage;
 
+    [TestInitialize]
+    public void Inicializar()
+    {
+        base.InicializarTeste();
+        autenticacaoPage = new AutenticacaoPageObject(driver!, enderecoBase!);
+        driver!.Manage().Cookies.DeleteAllCookies();
+    }
+
     [TestMethod]
     public void CT033_Deve_Cadastrar_Empresa_Com_Sucesso()
     {

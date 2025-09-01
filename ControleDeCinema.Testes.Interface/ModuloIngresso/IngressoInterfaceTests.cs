@@ -21,6 +21,7 @@ namespace ControleDeCinema.Testes.Interface.ModuloIngresso
         {
             base.InicializarTeste();
             autenticacaoPage = new AutenticacaoPageObject(driver!, enderecoBase!);
+            driver!.Manage().Cookies.DeleteAllCookies();
             indexPage = new IngressoIndexPageObject(driver!);
         }
 
