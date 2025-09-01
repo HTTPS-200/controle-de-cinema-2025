@@ -113,6 +113,7 @@ public abstract class TestFixture
         dbContext.Filmes.RemoveRange(dbContext.Filmes);
         dbContext.Salas.RemoveRange(dbContext.Salas);
         dbContext.Sessoes.RemoveRange(dbContext.Sessoes);
+        dbContext.Ingressos.RemoveRange(dbContext.Ingressos);
 
 
         dbContext.UserRoles.RemoveRange(dbContext.UserRoles);
