@@ -17,6 +17,7 @@ namespace ControleDeCinema.Testes.Interface.ModuloSessao
         {
             base.InicializarTeste();
             autenticacaoPage = new AutenticacaoPageObject(driver!, enderecoBase!);
+            driver!.Manage().Cookies.DeleteAllCookies();
             autenticacaoPage.RegistrarContaEmpresarial();
         }
 

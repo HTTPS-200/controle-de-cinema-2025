@@ -15,6 +15,8 @@ public sealed class GeneroFilmeInterfaceTests : TestFixture
         base.InicializarTeste();
 
         autenticacaoPage = new AutenticacaoPageObject(driver!, enderecoBase!);
+        driver!.Manage().Cookies.DeleteAllCookies();
+        driver.Navigate().GoToUrl("about:blank");
         autenticacaoPage.RegistrarContaEmpresarial();
     }
 

@@ -15,6 +15,8 @@ namespace ControleDeCinema.Testes.Interface.ModuloFilme
         {
             base.InicializarTeste();
             autenticacaoPage = new AutenticacaoPageObject(driver!, enderecoBase!);
+            driver!.Manage().Cookies.DeleteAllCookies();
+            //driver.Navigate().GoToUrl(enderecoBase + "/autenticacao/login");
             autenticacaoPage.RegistrarContaEmpresarial();
         }
 
