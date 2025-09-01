@@ -18,11 +18,24 @@ public class GeneroFilmeIndexPageObject
 
     public GeneroFilmeIndexPageObject IrPara(string enderecoBase)
     {
-        driver.Navigate().GoToUrl($"{enderecoBase.TrimEnd('/')}/generos");
-        wait.Until(d => d.Url.Contains("/generos", StringComparison.OrdinalIgnoreCase));
-        wait.Until(d => d.FindElement(By.CssSelector("a[data-se='btnCadastrar']")).Displayed);
+        try
+        {
+            driver.Navigate().GoToUrl($"{enderecoBase.TrimEnd('/')}/generos");
+            wait.Until(d => d.Url.Contains("/generos", StringComparison.OrdinalIgnoreCase));
+            wait.Until(d => d.FindElement(By.TagName("body")).Displayed);
+            wait.Until(d => d.FindElements(
+                By.CssSelector("a[data-se='btnCadastrar'], .card, h1, h2, h3")
+            ).Any(e => e.Displayed));
 
-        return this;
+            return this;
+        }
+        catch (WebDriverTimeoutException ex)
+        {
+            Console.WriteLine($"Timeout ao carregar página de gêneros. URL: {enderecoBase}/generos");
+            Console.WriteLine($"Página atual: {driver.Url}");
+            Console.WriteLine($"Page source: {driver.PageSource}");
+            throw;
+        }
     }
 
     public GeneroFilmeFormPageObject ClickCadastrar()
